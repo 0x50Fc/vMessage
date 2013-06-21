@@ -306,12 +306,32 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                         break;
                                     }
                                     
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size, "\r\n");
+                                    
+                                    state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
+                                    
+                                    if(state == StreamStateOK){
+                                        stream_socket_write(thread->client, dbuf.data + sizeof(MSGDatabaseEntity), sbuf.length - sizeof(MSGDatabaseEntity));
+                                    }
+                                    else{
+                                        break;
+                                    }
+                                    
                                 }
                                 
                                 ( * MSGServerProcess.databaseClass->cursorClose)(database,cursor);
                             }
+
                             
                             (* MSGServerProcess.databaseClass->close) (database);
+                        }
+                        
+                        sbuf.length = snprintf(sbuf.data, sbuf.size,"0\r\n\r\n");
+                        
+                        state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
+                        
+                        if(state == StreamStateOK){
+                            stream_socket_write(thread->client, sbuf.data, sbuf.length);
                         }
                         
                         (* MSGServerProcess.authClass->release)(auth);
