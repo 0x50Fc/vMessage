@@ -56,6 +56,15 @@
 		11237F4E177317E0002D95F0 /* hevent.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F1B177317E0002D95F0 /* hevent.c */; };
 		11237F5217731818002D95F0 /* hserver.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F5117731818002D95F0 /* hserver.c */; };
 		11237F551773189C002D95F0 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 11237F541773189C002D95F0 /* libz.dylib */; };
+		11237F581773EF58002D95F0 /* MSGServerProcess.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F571773EF58002D95F0 /* MSGServerProcess.c */; };
+		11237F641773F0B9002D95F0 /* hstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F5A1773F0B9002D95F0 /* hstream.c */; };
+		11237F651773F0B9002D95F0 /* hstream_pipe.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F5C1773F0B9002D95F0 /* hstream_pipe.c */; };
+		11237F661773F0B9002D95F0 /* hstream_process.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F5E1773F0B9002D95F0 /* hstream_process.c */; };
+		11237F671773F0B9002D95F0 /* hstream_tcp.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F601773F0B9002D95F0 /* hstream_tcp.c */; };
+		11237F681773F0B9002D95F0 /* hstream_websocket.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F621773F0B9002D95F0 /* hstream_websocket.c */; };
+		11237F6B1773F5C4002D95F0 /* MSG.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F6A1773F5C4002D95F0 /* MSG.c */; };
+		11237F6F1774113D002D95F0 /* MSGAuth.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F6E1774113D002D95F0 /* MSGAuth.c */; };
+		11237F7217741402002D95F0 /* MSGDatabase.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F7117741402002D95F0 /* MSGDatabase.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -176,6 +185,24 @@
 		11237F5017731810002D95F0 /* hserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hserver.h; sourceTree = "<group>"; };
 		11237F5117731818002D95F0 /* hserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hserver.c; sourceTree = "<group>"; };
 		11237F541773189C002D95F0 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		11237F561773EF4B002D95F0 /* MSGServerProcess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MSGServerProcess.h; sourceTree = "<group>"; };
+		11237F571773EF58002D95F0 /* MSGServerProcess.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MSGServerProcess.c; sourceTree = "<group>"; };
+		11237F5A1773F0B9002D95F0 /* hstream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hstream.c; sourceTree = "<group>"; };
+		11237F5B1773F0B9002D95F0 /* hstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hstream.h; sourceTree = "<group>"; };
+		11237F5C1773F0B9002D95F0 /* hstream_pipe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hstream_pipe.c; sourceTree = "<group>"; };
+		11237F5D1773F0B9002D95F0 /* hstream_pipe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hstream_pipe.h; sourceTree = "<group>"; };
+		11237F5E1773F0B9002D95F0 /* hstream_process.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hstream_process.c; sourceTree = "<group>"; };
+		11237F5F1773F0B9002D95F0 /* hstream_process.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hstream_process.h; sourceTree = "<group>"; };
+		11237F601773F0B9002D95F0 /* hstream_tcp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hstream_tcp.c; sourceTree = "<group>"; };
+		11237F611773F0B9002D95F0 /* hstream_tcp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hstream_tcp.h; sourceTree = "<group>"; };
+		11237F621773F0B9002D95F0 /* hstream_websocket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hstream_websocket.c; sourceTree = "<group>"; };
+		11237F631773F0B9002D95F0 /* hstream_websocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hstream_websocket.h; sourceTree = "<group>"; };
+		11237F691773F5BD002D95F0 /* MSG.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MSG.h; sourceTree = "<group>"; };
+		11237F6A1773F5C4002D95F0 /* MSG.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MSG.c; sourceTree = "<group>"; };
+		11237F6D17741134002D95F0 /* MSGAuth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MSGAuth.h; sourceTree = "<group>"; };
+		11237F6E1774113D002D95F0 /* MSGAuth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MSGAuth.c; sourceTree = "<group>"; };
+		11237F70177413FA002D95F0 /* MSGDatabase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MSGDatabase.h; sourceTree = "<group>"; };
+		11237F7117741402002D95F0 /* MSGDatabase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MSGDatabase.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +240,14 @@
 				11237EB8177317CF002D95F0 /* C */,
 				11237EAF177317A0002D95F0 /* main.c */,
 				11237EB1177317A0002D95F0 /* vMessageServer.1 */,
+				11237F561773EF4B002D95F0 /* MSGServerProcess.h */,
+				11237F571773EF58002D95F0 /* MSGServerProcess.c */,
+				11237F691773F5BD002D95F0 /* MSG.h */,
+				11237F6A1773F5C4002D95F0 /* MSG.c */,
+				11237F6D17741134002D95F0 /* MSGAuth.h */,
+				11237F6E1774113D002D95F0 /* MSGAuth.c */,
+				11237F70177413FA002D95F0 /* MSGDatabase.h */,
+				11237F7117741402002D95F0 /* MSGDatabase.c */,
 			);
 			path = vMessageServer;
 			sourceTree = "<group>";
@@ -220,6 +255,7 @@
 		11237EB8177317CF002D95F0 /* C */ = {
 			isa = PBXGroup;
 			children = (
+				11237F591773F0B9002D95F0 /* stream */,
 				11237F4F177317E8002D95F0 /* server */,
 				11237EB9177317E0002D95F0 /* core */,
 				11237F1A177317E0002D95F0 /* event */,
@@ -351,6 +387,24 @@
 			path = ../../c/server;
 			sourceTree = "<group>";
 		};
+		11237F591773F0B9002D95F0 /* stream */ = {
+			isa = PBXGroup;
+			children = (
+				11237F5A1773F0B9002D95F0 /* hstream.c */,
+				11237F5B1773F0B9002D95F0 /* hstream.h */,
+				11237F5C1773F0B9002D95F0 /* hstream_pipe.c */,
+				11237F5D1773F0B9002D95F0 /* hstream_pipe.h */,
+				11237F5E1773F0B9002D95F0 /* hstream_process.c */,
+				11237F5F1773F0B9002D95F0 /* hstream_process.h */,
+				11237F601773F0B9002D95F0 /* hstream_tcp.c */,
+				11237F611773F0B9002D95F0 /* hstream_tcp.h */,
+				11237F621773F0B9002D95F0 /* hstream_websocket.c */,
+				11237F631773F0B9002D95F0 /* hstream_websocket.h */,
+			);
+			name = stream;
+			path = ../../c/stream;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -449,6 +503,15 @@
 				11237F4C177317E0002D95F0 /* sha1.c in Sources */,
 				11237F4E177317E0002D95F0 /* hevent.c in Sources */,
 				11237F5217731818002D95F0 /* hserver.c in Sources */,
+				11237F581773EF58002D95F0 /* MSGServerProcess.c in Sources */,
+				11237F641773F0B9002D95F0 /* hstream.c in Sources */,
+				11237F651773F0B9002D95F0 /* hstream_pipe.c in Sources */,
+				11237F661773F0B9002D95F0 /* hstream_process.c in Sources */,
+				11237F671773F0B9002D95F0 /* hstream_tcp.c in Sources */,
+				11237F681773F0B9002D95F0 /* hstream_websocket.c in Sources */,
+				11237F6B1773F5C4002D95F0 /* MSG.c in Sources */,
+				11237F6F1774113D002D95F0 /* MSGAuth.c in Sources */,
+				11237F7217741402002D95F0 /* MSGDatabase.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
