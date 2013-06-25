@@ -477,23 +477,22 @@ static double MSGServerProcessTick (SRVServer * server,SRVProcess * process){
     
     i = 0;
     
-    while(i < MSGServerProcessClientMaxCount
+    while(i < MSGServerProcessClientMaxThread
           && MSGServerProcess.startIndex != MSGServerProcess.endIndex){
         
-        while(i < MSGServerProcessClientMaxCount){
-            thread = MSGServerProcess.threads + i;
-            if(thread->pthread ==0){
-                pthread_create(&thread->pthread, NULL, MSGServerProcessThreadRun, thread);
-            }
-            
-            if(thread->client ==0){
-                thread->client = MSGServerProcess.clients[MSGServerProcess.startIndex];
-                MSGServerProcess.startIndex = (MSGServerProcess.startIndex + 1) % MSGServerProcessClientMaxCount;
-                MSGServerProcess.sleep_v = 0.0;
-                break;
-            }
-            i++;
+        thread = MSGServerProcess.threads + i;
+        
+        if(thread->pthread ==0){
+            pthread_create(&thread->pthread, NULL, MSGServerProcessThreadRun, thread);
         }
+        
+        if(thread->client ==0){
+            thread->client = MSGServerProcess.clients[MSGServerProcess.startIndex];
+            MSGServerProcess.startIndex = (MSGServerProcess.startIndex + 1) % MSGServerProcessClientMaxCount;
+            MSGServerProcess.sleep_v = 0.0;
+        }
+        
+        i++;
     }
     
     return MSGServerProcess.sleep_v;

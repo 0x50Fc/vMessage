@@ -66,7 +66,7 @@ static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth
     snprintf(path, sizeof(path),"%s/%s/db",dir,auth->to);
     
     if(stat(path, &s) == -1){
-        mkdir(path, S_IRUSR | S_IWUSR);
+        mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     }
     
     strcat(path, "/w.db");
@@ -76,7 +76,7 @@ static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth
     if(fno == -1){
         fno = open(path, O_WRONLY | O_CREAT);
         if(fno != -1){
-            fchmod(fno, S_IRUSR | S_IWUSR);
+            fchmod(fno, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
             close(fno);
         }
     }
@@ -133,7 +133,7 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
     if(idxfno == -1){
         idxfno = open(path, O_WRONLY | O_CREAT);
         if(idxfno != -1){
-            fchmod(idxfno, S_IRUSR | S_IWUSR);
+            fchmod(idxfno, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
             close(idxfno);
         }
         idxfno = open(path, O_RDWR);
@@ -302,15 +302,14 @@ static MSGDatabaseEntity * MSGDatabaseDefaultCursorNext (MSGDatabase * database,
         
         lseek(cur->idxfno, cur->base.location + cursor->index * sizeof(MSGDatabaseIndex), SEEK_SET);
         
-        len = (huint32)read(cur->idxfno, cur->base.indexes, cur->base.size * sizeof(MSGDatabaseIndex));
+        len = (huint32) read(cur->idxfno, cur->base.indexes, cur->base.size * sizeof(MSGDatabaseIndex));
         
-        cursor->length = len / sizeof(MSGDatabaseIndex);
-        cursor->index = 0;
-        
-        if(cursor->length == 0){
+        if(len < sizeof(MSGDatabaseIndex)){
             return NULL;
         }
         
+        cursor->length = len / sizeof(MSGDatabaseIndex);
+        cursor->index = 0;
     }
     
     lseek(cur->dbfno, cursor->indexes[cursor->index].location, SEEK_SET);
