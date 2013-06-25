@@ -81,6 +81,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1103276E1779707400759A85 /* client.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = client.html; sourceTree = "<group>"; };
 		11237EAC177317A0002D95F0 /* vMessageServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vMessageServer; sourceTree = BUILT_PRODUCTS_DIR; };
 		11237EAF177317A0002D95F0 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		11237EB1177317A0002D95F0 /* vMessageServer.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = vMessageServer.1; sourceTree = "<group>"; };
@@ -248,6 +249,7 @@
 				11237F6E1774113D002D95F0 /* MSGAuth.c */,
 				11237F70177413FA002D95F0 /* MSGDatabase.h */,
 				11237F7117741402002D95F0 /* MSGDatabase.c */,
+				1103276E1779707400759A85 /* client.html */,
 			);
 			path = vMessageServer;
 			sourceTree = "<group>";
@@ -580,7 +582,7 @@
 		11237EB6177317A0002D95F0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					__MACOS__,
@@ -593,7 +595,7 @@
 		11237EB7177317A0002D95F0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					__MACOS__,
 					__MACOSX__,
@@ -621,6 +623,7 @@
 				11237EB7177317A0002D95F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

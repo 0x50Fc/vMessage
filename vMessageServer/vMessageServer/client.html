@@ -1,0 +1,33 @@
+<html>
+
+    <head>
+        <title>vMessageServer Client</title>
+        
+        <script type="text/javascript">
+            
+            function Send(text){
+                
+                
+                var http = new XMLHttpRequest();
+                
+                http.onreadystatechange = function(){
+                    if(http.readyState == 4){
+                        
+                    }
+                };
+                
+                http.open("POST","http://localhost:55554/9vteam")
+                
+            }
+            
+        </script>
+    
+    </head>
+    <body>
+        <form action="http://localhost:61112/hailong" method="post" >
+            <input type="text" name="msg"></input>
+            <input type="submit"></input>
+        </form>
+    </body>
+    
+</html>

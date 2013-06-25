@@ -21,7 +21,7 @@ huint32 MSGBufferExpandSize(MSGBuffer * buf,huint32 expandSize){
     }
     else if(buf->size < expandSize){
         buf->size = expandSize;
-        buf->data = malloc(buf->size);
+        buf->data = realloc(buf->data, buf->size);
     }
     return buf->size;
 }

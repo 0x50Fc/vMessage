@@ -24,7 +24,7 @@ extern "C" {
     typedef struct _MSGDatabaseEntity {
         hchar type[MSG_DATABASE_ENTITY_TYPE_SIZE];
         hchar user[MSG_USER_SIZE];
-        huint16 length;
+        huint32 length;
         hdouble timestamp;
     } MSGDatabaseEntity;
     
