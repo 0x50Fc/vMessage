@@ -24,6 +24,11 @@
 
 #define MSGServerProcessDefaultMaxContentLength    102400
 
+#define MSGAllowOrigin              "*"
+#define MSGAllowHeaders             "Authorization"
+#define MSGAllowMethod              "GET, POST, OPTIONS"
+#define MSGAllowResponseHeaders     "Timestamp"
+
 typedef struct _MSGServerProcessThread{
     pthread_t pthread;
     int client;
@@ -113,7 +118,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                         
                         if(state == StreamStateOK){
                             
-                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 411 Length Required\r\n\r\n");
+                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 411 Length Required\r\nAccess-Control-Allow-Origin: %s\r\n\r\n",MSGAllowOrigin);
                             
                             stream_socket_write(thread->client, sbuf.data, sbuf.length);
                             
@@ -126,7 +131,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                         
                         if(state == StreamStateOK){
                             
-                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 413 Request Entity Too Large\r\n\r\n");
+                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 413 Request Entity Too Large\r\nAccess-Control-Allow-Origin: %s\r\n\r\n",MSGAllowOrigin);
                             
                             stream_socket_write(thread->client, sbuf.data, sbuf.length);
                             
@@ -165,7 +170,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                             
                             if(state == StreamStateOK || state == StreamStateNone){
                                 
-                                database = (* MSGServerProcess.databaseClass->open)(MSGServerProcess.databaseClass);
+                                database = (* MSGServerProcess.databaseClass->open)(MSGServerProcess.databaseClass,& request,& sbuf);
                                 
                                 if(database){
                                  
@@ -178,7 +183,8 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                     
                                     if(state == StreamStateOK){
                                         
-                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 %d %s\r\n\r\n",dbResult.statusCode,dbResult.status);
+                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 %d %s\r\nAccess-Control-Allow-Origin: %s\r\n\r\n"
+                                                               ,dbResult.statusCode,dbResult.status,MSGAllowOrigin);
                                         
                                         stream_socket_write(thread->client, sbuf.data, sbuf.length);
                                         
@@ -189,7 +195,8 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                     
                                     if(state == StreamStateOK){
                                         
-                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 507 Insufficient Storage\r\n\r\n");
+                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 507 Insufficient Storage\r\nAccess-Control-Allow-Origin: %s\r\n\r\n"
+                                                               ,MSGAllowOrigin);
                                         
                                         stream_socket_write(thread->client, sbuf.data, sbuf.length);
                                         
@@ -202,7 +209,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                 
                                 if(state == StreamStateOK){
                                     
-                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 408 Request Timeout\r\n\r\n");
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 408 Request Timeout\r\nAccess-Control-Allow-Origin: %s\r\n\r\n",MSGAllowOrigin);
                                     
                                     stream_socket_write(thread->client, sbuf.data, sbuf.length);
                                     
@@ -218,7 +225,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                             
                             if(state == StreamStateOK){
                                 
-                                sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic\r\n\r\n");
+                                sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic\r\nAccess-Control-Allow-Origin: %s\r\n\r\n",MSGAllowOrigin);
                                 
                                 stream_socket_write(thread->client, sbuf.data, sbuf.length);
                                 
@@ -235,7 +242,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                     
                     if(auth){
 
-                        database = (* MSGServerProcess.databaseClass->open) (MSGServerProcess.databaseClass);
+                        database = (* MSGServerProcess.databaseClass->open) (MSGServerProcess.databaseClass,& request,& sbuf);
                         
                         if(database){
                         
@@ -247,11 +254,12 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                             if(state == StreamStateOK){
                                 
                                 if(* auth->cookie != 0){
-                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nSet-Cookie: %s\r\nTransfer-Encoding: chunked\r\n\r\n"
-                                                           ,auth->cookie);
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nSet-Cookie: %s\r\nTransfer-Encoding: chunked\r\nAccess-Control-Allow-Origin: %s\r\nTimestamp: %f\r\nAccess-Control-Expose-Headers: %s\r\n\r\n"
+                                                           ,auth->cookie,MSGAllowOrigin,cursor ? cursor->timestamp : 0 ,MSGAllowResponseHeaders);
                                 }
                                 else{
-                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n");
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nAccess-Control-Allow-Origin: %s\r\nTimestamp: %f\r\nAccess-Control-Expose-Headers: %s\r\n\r\n"
+                                                           ,MSGAllowOrigin,cursor ? cursor->timestamp : 0,MSGAllowResponseHeaders);
                                 }
                                 
                                 stream_socket_write(thread->client, sbuf.data, sbuf.length);
@@ -263,11 +271,11 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                 while ((entity = ( * MSGServerProcess.databaseClass->cursorNext)(database,cursor,&dbuf))) {
                                     
         
-                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"Content-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\n\r\n"
-                                                           ,entity->type,entity->length,entity->timestamp);
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"Content-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\nFrom: %s\r\n\r\n"
+                                                           ,entity->type,entity->length,entity->timestamp,entity->user);
                                     
-                                    sbuf.length = snprintf(sbuf.data, sbuf.size, "%x\r\nContent-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\n\r\n"
-                                                           ,sbuf.length + entity->length + 2, entity->type,entity->length,entity->timestamp);
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size, "%x\r\nContent-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\nFrom: %s\r\n\r\n"
+                                                           ,sbuf.length + entity->length + 2, entity->type,entity->length,entity->timestamp,entity->user);
                                     
                                     MSGBufferExpandSize(&sbuf, sbuf.length + entity->length + 8);
                                     
@@ -296,6 +304,15 @@ static void * MSGServerProcessThreadRun(void * userInfo){
 
                             
                             (* MSGServerProcess.databaseClass->close) (database);
+                            
+                            sbuf.length = snprintf(sbuf.data, sbuf.size,"0\r\n\r\n");
+                            
+                            state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
+                            
+                            if(state == StreamStateOK){
+                                stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                            }
+                            
                         }
                         else{
                             
@@ -304,11 +321,11 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                             if(state == StreamStateOK){
                                 
                                 if(* auth->cookie != 0){
-                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nSet-Cookie: %s\r\nTransfer-Encoding: chunked\r\n\r\n"
-                                                           ,auth->cookie);
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nSet-Cookie: %s\r\nContent-Length: 0\r\nAccess-Control-Allow-Origin: %s\r\n\r\n"
+                                                           ,auth->cookie,MSGAllowOrigin);
                                 }
                                 else{
-                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\n\r\n");
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 0\r\nAccess-Control-Allow-Origin: %s\r\n\r\n",MSGAllowOrigin);
                                 }
                                 
                                 stream_socket_write(thread->client, sbuf.data, sbuf.length);
@@ -316,13 +333,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                             }
                         }
                         
-                        sbuf.length = snprintf(sbuf.data, sbuf.size,"0\r\n\r\n");
-                        
-                        state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
-                        
-                        if(state == StreamStateOK){
-                            stream_socket_write(thread->client, sbuf.data, sbuf.length);
-                        }
+
                         
                         (* MSGServerProcess.authClass->release)(auth);
                     }
@@ -332,13 +343,24 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                         
                         if(state == StreamStateOK){
                             
-                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic\r\n\r\n");
+                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 401 Authorization Required\r\nWWW-Authenticate: Basic\r\nAccess-Control-Allow-Origin: %s\r\n\r\n",MSGAllowOrigin);
                             
                             stream_socket_write(thread->client, sbuf.data, sbuf.length);
                             
                         }
                     }
                     
+                }
+                else if(MSGStringEqual(&sbuf, request.method, "OPTIONS")){
+                    state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
+                    
+                    if(state == StreamStateOK){
+                        
+                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: %s\r\nAccess-Control-Allow-Methods: %s\r\nAccess-Control-Allow-Headers: %s\r\nContent-Length: 0\r\nAccess-Control-Expose-Headers: %s\r\n\r\n",MSGAllowOrigin,MSGAllowMethod,MSGAllowHeaders,MSGAllowResponseHeaders);
+                        
+                        stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                        
+                    }
                 }
                 else {
                     

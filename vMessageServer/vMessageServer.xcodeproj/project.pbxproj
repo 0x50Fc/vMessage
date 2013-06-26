@@ -65,6 +65,7 @@
 		11237F6B1773F5C4002D95F0 /* MSG.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F6A1773F5C4002D95F0 /* MSG.c */; };
 		11237F6F1774113D002D95F0 /* MSGAuth.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F6E1774113D002D95F0 /* MSGAuth.c */; };
 		11237F7217741402002D95F0 /* MSGDatabase.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F7117741402002D95F0 /* MSGDatabase.c */; };
+		1140D718177AB9FD009B7F82 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1140D717177AB9FD009B7F82 /* libssl.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -204,6 +205,9 @@
 		11237F6E1774113D002D95F0 /* MSGAuth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MSGAuth.c; sourceTree = "<group>"; };
 		11237F70177413FA002D95F0 /* MSGDatabase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MSGDatabase.h; sourceTree = "<group>"; };
 		11237F7117741402002D95F0 /* MSGDatabase.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MSGDatabase.c; sourceTree = "<group>"; };
+		1140D714177A7FDB009B7F82 /* client.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = client.js; sourceTree = "<group>"; };
+		1140D716177A8A2B009B7F82 /* sample.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = sample.html; sourceTree = "<group>"; };
+		1140D717177AB9FD009B7F82 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +215,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1140D718177AB9FD009B7F82 /* libssl.dylib in Frameworks */,
 				11237F551773189C002D95F0 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -221,7 +226,9 @@
 		11237EA3177317A0002D95F0 = {
 			isa = PBXGroup;
 			children = (
+				1140D717177AB9FD009B7F82 /* libssl.dylib */,
 				11237F541773189C002D95F0 /* libz.dylib */,
+				1140D713177A7FCB009B7F82 /* js */,
 				11237EAE177317A0002D95F0 /* vMessageServer */,
 				11237EAD177317A0002D95F0 /* Products */,
 			);
@@ -405,6 +412,16 @@
 			);
 			name = stream;
 			path = ../../c/stream;
+			sourceTree = "<group>";
+		};
+		1140D713177A7FCB009B7F82 /* js */ = {
+			isa = PBXGroup;
+			children = (
+				1140D714177A7FDB009B7F82 /* client.js */,
+				1140D716177A8A2B009B7F82 /* sample.html */,
+			);
+			name = js;
+			path = ../Clients/js;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

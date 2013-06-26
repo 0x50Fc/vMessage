@@ -1,0 +1,156 @@
+<html>
+    
+    <head>
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>vMessageServer Client</title>
+        
+        <script type="text/javascript" src="client.js"></script>
+        
+        <script type="text/javascript">
+            
+            var port = 58131;
+            
+            var message,to,body,commit;
+            
+            function onLoad(){
+                
+                message = document.getElementById("message");
+                to = document.getElementById("to");
+                body = document.getElementById("body");
+                commit = document.getElementById("commit");
+                
+                MSG = new vMessageClient("http://localhost:"+port,"hailong","");
+                
+                MSG.onmessage = function(msg){
+                    
+                    var html = [];
+                    
+                    html.push("<h1>");
+                    html.push(msg.header["From"]);
+                    html.push(":</h1>");
+                    
+                    html.push("<p>");
+                    html.push(msg.body["body"]);
+                    html.push("</p>");
+                    
+                    var div = document.createElement("div");
+                    
+                    div.innerHTML = html.join('');
+                    
+                    message.appendChild(div);
+                    
+                    var height = message.clientHeight;
+                    
+                    if(height === undefined){
+                        height = message.offsetHeight;
+                    }
+                    
+                    if(message.scrollHeight > height){
+                        message.scrollTop = message.scrollHeight - height;
+                    }
+                    
+                };
+                
+                MSG.start();
+        
+            }
+            
+            function send(){
+                
+                MSG.send(to.value, {"body":body.value});
+                
+                body.value = "";
+                
+                return false;
+            }
+                        
+        </script>
+        
+        <style type="text/css">
+            
+            .message {
+                max-width: 400px;
+                max-height: 400px;
+                min-height: 200px;
+                overflow: auto;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #dddddd;
+                padding: 6px;
+            }
+            
+            .message h1 {
+                color: #d51b1b;
+                font-size: 18px;
+                font-weight: bold;
+            }
+            
+            .message p {
+                font-size: 18px;
+                padding-left: 20px;
+                line-height: 160%;
+            }
+            
+            .send {
+                max-width: 400px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #dddddd;
+                margin-top: 20px;
+                padding: 6px;
+            }
+            
+            #body {
+                width: 100%;
+                max-width: 100%;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #dddddd;
+                min-height: 60px;
+                margin-top: 6px;
+                padding: 4px;
+            }
+            
+            #to {
+                width: 60%;
+                min-width: 200px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #dddddd;
+                height: 30px;
+                padding: 4px;
+            }
+            
+            #commit {
+                background-color: #4d90fe;
+                border: 1px solid #3079ed;
+                color: #fff;
+                -webkit-border-radius: 2px;
+                border-radius: 2px;
+                font-size: 11px;
+                font-weight: bold;
+                height: 27px;
+                line-height: 27px;
+                margin: 2px 0;
+                min-width: 54px;
+                padding: 0 8px;
+                text-align: center;
+            }
+            
+        </style>
+        
+    </head>
+    <body onload="onLoad()">
+        <div class="message" id="message">
+            
+        </div>
+        <form class="send" onsubmit="return send();">
+            <input id="to" class="to" type="text" value="hailong" title="to"></input><br />
+            <input id="body" class="body" type="text" value="" title="body"></input><br />
+            <input id="commit" class="commit" type="submit" value="Send" ></input>
+        </form>
+    </body>
+    
+</html>

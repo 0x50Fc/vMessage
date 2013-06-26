@@ -48,9 +48,10 @@ extern "C" {
         huint32 length;
         huint32 index;
         huint32 location;
+        hdouble timestamp;
     } MSGDatabaseCursor;
     
-    typedef MSGDatabase * (* MSGDatabaseOpen) (struct _MSGDatabaseClass * clazz);
+    typedef MSGDatabase * (* MSGDatabaseOpen) (struct _MSGDatabaseClass * clazz,MSGHttpRequest * request,MSGBuffer * sbuf);
     
     typedef void (* MSGDatabaseClose) (MSGDatabase * database);
     

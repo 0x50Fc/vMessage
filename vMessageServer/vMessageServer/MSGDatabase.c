@@ -16,8 +16,13 @@ MSGDatabaseResult MSGDatabaseResultWriteError = {601,"write error"};
 
 static MSGDatabase gMSGDatabaseDefault = {&MSGDatabaseDefaultClass};
 
-static MSGDatabase * MSGDatabaseDefaultOpen (struct _MSGDatabaseClass * clazz){
-    return &gMSGDatabaseDefault;
+static MSGDatabase * MSGDatabaseDefaultOpen (struct _MSGDatabaseClass * clazz,MSGHttpRequest * request,MSGBuffer * sbuf){
+    
+    if (request->path.length > 1) {
+        return &gMSGDatabaseDefault;
+    }
+
+    return NULL;
 }
 
 static void  MSGDatabaseDefaultClose (MSGDatabase * database){
@@ -202,21 +207,13 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
     cursor->length = len;
     cursor->base.size = MSG_DATABASE_CURSOR_INDEX_SIZE;
     cursor->base.indexes = (MSGDatabaseIndex *) malloc(sizeof(MSGDatabaseIndex) * cursor->base.size);
+    cursor->base.timestamp = timestamp;
     
     if( timestamp == 0.0){
         
         lseek(idxfno, 0, SEEK_SET);
         len = (huint32)read(idxfno, cursor->base.indexes, cursor->base.size * sizeof(MSGDatabaseIndex));
         cursor->base.length = len / sizeof(MSGDatabaseIndex);
-        
-        if(cursor->base.length ==0){
-            flock(idxfno, LOCK_UN);
-            close(idxfno);
-            close(dbfno);
-            free(cursor->base.indexes);
-            free(cursor);
-            return NULL;
-        }
         
     }
     else{
@@ -257,12 +254,11 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
 
             }
             else if(timestamp >= cursor->base.indexes[cursor->base.length - 1].timestamp){
-                flock(idxfno, LOCK_UN);
-                close(idxfno);
-                close(dbfno);
-                free(cursor->base.indexes);
-                free(cursor);
-                return NULL;
+                
+                cursor->base.index = cursor->base.length;
+                cursor->base.length = 0;
+                break;
+
             }
             else{
                 {
