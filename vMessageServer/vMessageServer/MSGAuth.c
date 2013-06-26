@@ -11,7 +11,7 @@
 
 #include "hbuffer.h"
 #include "hbase64.h"
-
+#include "hinifile.h"
 
 static MSGAuth * MSGAuthDefaultCreate (struct _MSGAuthClass * clazz,MSGHttpRequest * request,MSGBuffer * sbuf){
     
@@ -21,6 +21,8 @@ static MSGAuth * MSGAuthDefaultCreate (struct _MSGAuthClass * clazz,MSGHttpReque
     hchar b[MSG_USER_SIZE * 2], * user, * password,buf[PATH_MAX],*p,*t;
     huint32 len,c;
     struct stat s;
+    hinifile_t cfg;
+    InvokeTickBegin
     
     if(path == NULL){
         return NULL;
@@ -52,6 +54,30 @@ static MSGAuth * MSGAuthDefaultCreate (struct _MSGAuthClass * clazz,MSGHttpReque
             snprintf(buf, sizeof(buf),"%s/%s",path,user);
             
             if(stat(buf, &s) != -1 && S_ISDIR(s.st_mode)){
+                
+                snprintf(buf, sizeof(buf), "%s/%s/cfg.ini",path,user);
+                
+                cfg = inifile_alloc(buf);
+                
+                if(cfg){
+                    
+                    while(inifile_read(cfg)){
+                        
+                        if(strcmp(inifile_section(cfg),"AUTH") ==0){
+                            if(strcmp(inifile_key(cfg), "password") ==0){
+                                if (strcmp(password, inifile_value(cfg)) != 0) {
+                                    inifile_dealloc(cfg);
+                                    return NULL;
+                                }
+                                break;
+                            }
+                        }
+                        
+                    }
+                    
+                    inifile_dealloc(cfg);
+                }
+                
                 auth = (MSGAuth *) malloc(sizeof(MSGAuth));
                 memset(auth, 0, sizeof(MSGAuth));
                 auth->clazz = &MSGAuthDefaultClass;

@@ -10,7 +10,9 @@
         
         <script type="text/javascript">
             
-            var port = 58131;
+            var port = 61185;
+            var username = "hailong";
+            var password = "12345678";
             
             var message,to,body,commit;
             
@@ -21,7 +23,7 @@
                 body = document.getElementById("body");
                 commit = document.getElementById("commit");
                 
-                MSG = new vMessageClient("http://localhost:"+port,"hailong","");
+                MSG = new vMessageClient("http://localhost:"+port,username,password);
                 
                 MSG.onmessage = function(msg){
                     
