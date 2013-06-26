@@ -15,5 +15,6 @@
 @property(nonatomic,assign) NSUInteger contentLength;
 @property(nonatomic,assign) NSTimeInterval timestamp;
 @property(nonatomic,retain) NSData * body;
+@property(nonatomic,readonly) id dataObject;
 
 @end

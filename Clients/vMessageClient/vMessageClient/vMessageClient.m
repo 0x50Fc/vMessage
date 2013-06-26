@@ -66,6 +66,8 @@
     [_url release];
     [_user release];
     [_password release];
+    [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+    [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
     [_runloop release];
     [_inputStream close];
     [_inputStream setDelegate:nil];
@@ -108,12 +110,9 @@
         _response = nil;
     }
     
-    _inputState.length = 0;
-    _inputState.index = 0;
-    _inputState.state = 0;
+    memset(&_inputState, 0,sizeof(_inputState));
+    memset(&_outputState, 0, sizeof(_outputState));
     
-    _outputState.length = 0;
-    _outputState.index = 0;
     
     self.outputData = nil;
     self.message = nil;
@@ -172,6 +171,9 @@
         
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendRequest) object:nil];
         
+        [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+        [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+        
         [_inputStream close];
         [_inputStream setDelegate:nil];
         self.inputStream = nil;
@@ -201,9 +203,22 @@
                 while([_inputStream hasBytesAvailable]){
                     
                     if(_inputState.length == 0){
-                        _inputState.length = [_inputStream read:_inputData maxLength:sizeof(_inputData)];
-                        _inputState.index = 0;
-                        _inputState.protocol = 0;
+                        if(_inputState.index < sizeof(_inputData)){
+                            NSInteger len = [_inputStream read:_inputData + _inputState.index
+                                                    maxLength:sizeof(_inputData) - _inputState.index];
+                            if(len <= 0){
+                                return;
+                            }
+                            _inputState.length = len;
+                        }
+                        else{
+                            NSInteger len = [_inputStream read:_inputData maxLength:sizeof(_inputData)];
+                            if(len <= 0){
+                                return;
+                            }
+                            _inputState.length = len;
+                            _inputState.index = 0;
+                        }
                     }
                     
                     uint8_t * pByte = _inputData + _inputState.index;
@@ -277,6 +292,8 @@
                             {
                                 // key
                                 if(*pByte == ':'){
+                                    *pByte = 0;
+                                    
                                     _inputState.state = 5;
                                     _inputState.value = 0;
                                 }
@@ -298,8 +315,10 @@
                                 // value
                                 if(*pByte == '\r'){
                                     
+                                    *pByte = 0;
                                 }
                                 else if(*pByte == '\n'){
+                                    *pByte = 0;
                                     
                                     if(_inputState.key && _inputState.value){
                                         NSString * key = [NSString stringWithCString:_inputState.key encoding:NSUTF8StringEncoding];
@@ -310,6 +329,7 @@
                                     
                                     _inputState.key = 0;
                                     _inputState.value = 0;
+                                    _inputState.state = 4;
                                 }
                                 else if(_inputState.value == 0){
                                     if(*pByte == ' '){
@@ -323,6 +343,37 @@
                                 break;
                             case 6:
                             {
+                                if(CFHTTPMessageGetResponseStatusCode(_response) != 200){
+                                    CFStringRef status = CFHTTPMessageCopyResponseStatusLine(_response);
+                                    CFDictionaryRef fields = CFHTTPMessageCopyAllHeaderFields(_response);
+                                    
+                                    NSMutableDictionary * data = [NSMutableDictionary dictionaryWithDictionary:(NSDictionary *) fields];
+                                    
+                                    [data setValue:(id) status forKey:NSLocalizedDescriptionKey];
+                                    
+                                    CFRelease(status);
+                                    CFRelease(fields);
+                                    
+                                    [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_inputStream setDelegate:nil];
+                                    [_outputStream setDelegate:nil];
+                                    [_inputStream close];
+                                    [_outputStream close];
+                                    
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                        
+                                        if(self.started){
+                                            if([_delegate respondsToSelector:@selector(vMessageClient:didFailError:)]){
+                                                [_delegate vMessageClient:self didFailError:[NSError errorWithDomain:@"vMessageClient" code:CFHTTPMessageGetResponseStatusCode(_response) userInfo:data]];
+                                            }
+                                        }
+                                        
+                                    });
+                                    
+                                    return;
+                                }
+                                
                                 CFStringRef encoding = CFHTTPMessageCopyHeaderFieldValue(_response, (CFStringRef) @"Transfer-Encoding");
                                 
                                 _inputState.chunked = [(id)encoding isEqualToString:@"chunked"];
@@ -333,6 +384,10 @@
                                 
                                 if(!_inputState.chunked){
                                     
+                                    [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_inputStream setDelegate:nil];
+                                    [_outputStream setDelegate:nil];
                                     [_inputStream close];
                                     [_outputStream close];
                                     
@@ -345,8 +400,19 @@
                                         }
                                         
                                     });
+                                    
+                                    return;
                                 }
                                 else{
+                                    
+                                    CFStringRef timestamp = CFHTTPMessageCopyHeaderFieldValue(_response, (CFStringRef) @"Timestamp");
+                                    
+                                    if(timestamp){
+                                        
+                                        _timestamp = atof([(NSString *) timestamp UTF8String]);
+                                        CFRelease(timestamp);
+                                    }
+                                    
                                     _inputState.state = 7;
                                     _inputState.key = 0;
                                     _inputState.chunkedLength = 0;
@@ -365,6 +431,10 @@
                                     
                                     if(atoi(_inputState.chunkedLength) ==0){
                                         
+                                        [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_inputStream setDelegate:nil];
+                                        [_outputStream setDelegate:nil];
                                         [_inputStream close];
                                         [_outputStream close];
                                         
@@ -456,6 +526,14 @@
                                     _inputState.key = 0;
                                     _inputState.value = 0;
                                 }
+                                else if(_inputState.value == 0){
+                                    if(* pByte == ' '){
+                                        
+                                    }
+                                    else{
+                                        _inputState.value = (char *) pByte;
+                                    }
+                                }
                             }
                                 break;
                             case 10:
@@ -465,7 +543,7 @@
                                     if(_message.body == nil){
                                         _message.body = [NSMutableData dataWithCapacity:_inputState.contentLength];
                                     }
-                                    [(NSMutableData *) _message appendBytes:pByte length:1];
+                                    [(NSMutableData *) _message.body appendBytes:pByte length:1];
                                     _inputState.contentLength --;
                                 }
                                 else if(*pByte == '\r'){
@@ -474,12 +552,16 @@
                                 else if(*pByte == '\n'){
                                     _inputState.key = 0;
                                     _inputState.value = 0;
-                                    _inputState.state = 7;
+                                    _inputState.state = 11;
                                     
                                     {
                                         vMessage * msg = self.message;
                                         vMessageClient * client = self;
+                                        if(msg.timestamp){
+                                            self.timestamp = msg.timestamp;
+                                        }
                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                            self.idle = self.minIdle;
                                             if(client.started){
                                                 if([client.delegate respondsToSelector:@selector(vMessageClient:didRecvMessage:)]){
                                                     [client.delegate vMessageClient:client didRecvMessage:msg];
@@ -488,6 +570,39 @@
                                         });
                                         self.message = nil;
                                     }
+                                }
+                            }
+                                break;
+                            case 11:
+                            {
+                                if( *pByte == '\r'){
+                                    
+                                }
+                                else if( *pByte == '\n'){
+                                    _inputState.state = 7;
+                                    _inputState.chunkedLength = 0;
+                                }
+                                else{
+                                    [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_inputStream setDelegate:nil];
+                                    [_outputStream setDelegate:nil];
+                                    [_inputStream close];
+                                    [_outputStream close];
+                                    
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                        
+                                        if(self.started){
+                                            [self performSelector:@selector(sendRequest) withObject:nil afterDelay:_idle];
+                                            _idle += _addIdle;
+                                            if(_idle > _maxIdle){
+                                                _idle = _maxIdle;
+                                            }
+                                        }
+                                        
+                                    });
+                                    
+                                    return;
                                 }
                             }
                                 break;
@@ -516,6 +631,8 @@
                     
                     if(_outputState.length ==0){
                         self.outputData = nil;
+                        [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                        [_outputStream setDelegate:nil];
                         [_outputStream close];
                     }
                     
@@ -539,6 +656,11 @@
                         _outputState.index = length;
                         _outputState.length = CFDataGetLength(data) - length;
                     }
+                    else{
+                        [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                        [_outputStream setDelegate:nil];
+                        [_outputStream close];
+                    }
                     
                     CFRelease(data);
 
@@ -550,6 +672,11 @@
         case NSStreamEventErrorOccurred:
         {
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sendRequest) object:nil];
+            
+            [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+            [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+            [_inputStream setDelegate:nil];
+            [_outputStream setDelegate:nil];
             [_inputStream close];
             [_outputStream close];
             

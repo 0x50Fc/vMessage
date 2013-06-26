@@ -23,7 +23,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    self.client = [[[vMessageClient alloc] initWithURL:[NSURL URLWithString:@"http://localhost:61185"] user:@"hailong" password:@"12345678"] autorelease];
+    self.client = [[[vMessageClient alloc] initWithURL:[NSURL URLWithString:@"http://localhost:49242"] user:@"hailong" password:@"12345678"] autorelease];
     
     [_client setDelegate:self];
     
@@ -40,10 +40,13 @@
 
 -(void) vMessageClient:(vMessageClient *) client didRecvMessage:(vMessage *) message{
     
+    
+    NSLog(@"%@",message.dataObject);
+    
 }
 
 -(void) vMessageClient:(vMessageClient *) client didFailError:(NSError *) error{
-    
+    NSLog(@"%@",error);
 }
 
 @end
