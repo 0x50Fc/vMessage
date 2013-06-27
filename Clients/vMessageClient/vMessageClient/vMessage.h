@@ -8,6 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+@interface NSString (vMessage)
+
+-(NSString *) stringByAddingMessageEscapes;
+
+-(NSString *) stringByReplacingMessageEscapes;
+
+@end
+
 @interface vMessage : NSObject
 
 @property(nonatomic,retain) NSString * from;

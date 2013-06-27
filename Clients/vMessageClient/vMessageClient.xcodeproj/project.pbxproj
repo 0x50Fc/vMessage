@@ -24,6 +24,10 @@
 		1140D770177B02F6009B7F82 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1140D76F177B02F6009B7F82 /* ViewController.m */; };
 		1140D773177B02F6009B7F82 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1140D771177B02F6009B7F82 /* ViewController.xib */; };
 		1140D77B177B0431009B7F82 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1140D77A177B0431009B7F82 /* CFNetwork.framework */; };
+		1140D77E177BD3CB009B7F82 /* vMessagePublish.h in Headers */ = {isa = PBXBuildFile; fileRef = 1140D77C177BD3CB009B7F82 /* vMessagePublish.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1140D77F177BD3CB009B7F82 /* vMessagePublish.m in Sources */ = {isa = PBXBuildFile; fileRef = 1140D77D177BD3CB009B7F82 /* vMessagePublish.m */; };
+		1140D782177BDE15009B7F82 /* vMessageBodyPublish.h in Headers */ = {isa = PBXBuildFile; fileRef = 1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1140D783177BDE15009B7F82 /* vMessageBodyPublish.m in Sources */ = {isa = PBXBuildFile; fileRef = 1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +67,10 @@
 		1140D76F177B02F6009B7F82 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		1140D772177B02F6009B7F82 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		1140D77A177B0431009B7F82 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		1140D77C177BD3CB009B7F82 /* vMessagePublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessagePublish.h; sourceTree = "<group>"; };
+		1140D77D177BD3CB009B7F82 /* vMessagePublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessagePublish.m; sourceTree = "<group>"; };
+		1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageBodyPublish.h; sourceTree = "<group>"; };
+		1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageBodyPublish.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +134,10 @@
 				1140D74A177ACEC3009B7F82 /* vMessageClient.m */,
 				1140D74C177AD108009B7F82 /* vMessage.h */,
 				1140D74D177AD108009B7F82 /* vMessage.m */,
+				1140D77C177BD3CB009B7F82 /* vMessagePublish.h */,
+				1140D77D177BD3CB009B7F82 /* vMessagePublish.m */,
+				1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */,
+				1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */,
 			);
 			path = vMessageClient;
 			sourceTree = "<group>";
@@ -176,6 +188,8 @@
 			files = (
 				1140D750177AD1B7009B7F82 /* vMessage.h in Headers */,
 				1140D751177AD1BE009B7F82 /* vMessageClient.h in Headers */,
+				1140D77E177BD3CB009B7F82 /* vMessagePublish.h in Headers */,
+				1140D782177BDE15009B7F82 /* vMessageBodyPublish.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +289,8 @@
 			files = (
 				1140D74B177ACEC3009B7F82 /* vMessageClient.m in Sources */,
 				1140D74E177AD108009B7F82 /* vMessage.m in Sources */,
+				1140D77F177BD3CB009B7F82 /* vMessagePublish.m in Sources */,
+				1140D783177BDE15009B7F82 /* vMessageBodyPublish.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
