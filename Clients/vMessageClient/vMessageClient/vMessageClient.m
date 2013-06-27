@@ -470,7 +470,13 @@
                                 else if( *pByte == '\n'){
                                     *pByte = 0;
                                     
-                                    if(atoi(_inputState.chunkedLength) ==0){
+                                    NSUInteger length = 0;
+                                    
+                                    if(_inputState.chunkedLength){
+                                        sscanf(_inputState.chunkedLength,"%x", &length);
+                                    }
+                                    
+                                    if(length ==0){
                                         
                                         [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
                                         [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
