@@ -75,6 +75,7 @@
     [_client release];
     [_to release];
     [_outputData release];
+    [_runloop release];
     [super dealloc];
 }
 
@@ -268,11 +269,17 @@
                                     _inputState.state = 4;
                                     _inputState.key = 0;
                                     
-                                    NSString * status = [NSString stringWithCString:_inputState.status encoding:NSUTF8StringEncoding];
                                     
-                                    NSString * version = [NSString stringWithCString:_inputState.version encoding:NSUTF8StringEncoding];
+                                    CFStringRef version = CFStringCreateWithCString(nil, _inputState.version, kCFStringEncodingUTF8);
                                     
-                                    _response = CFHTTPMessageCreateResponse(nil, atoi(_inputState.statusCode), (CFStringRef) status, (CFStringRef) version);
+                                    if(_response){
+                                        CFRelease(_response);
+                                        _response = nil;
+                                    }
+                                    
+                                    _response = CFHTTPMessageCreateResponse(nil, atoi(_inputState.statusCode), nil, version);
+                        
+                                    CFRelease(version);
                                     
                                 }
                                 else if(_inputState.status ==0){

@@ -226,7 +226,6 @@
     
 }
 
-
 - (void)stream:(NSStream *)aStream handleEvent:(NSStreamEvent)eventCode{
     
     switch (eventCode) {
@@ -283,7 +282,7 @@
                                 // HTTP/1.1
                                 if(*pByte == ' '){
                                     *pByte = 0;
-                                    _inputState.statusCode = (char *) pByte + 1;
+                                    _inputState.statusCode = 0;
                                     _inputState.state = 2;
                                 }
                                 else if(_inputState.version ==0){
@@ -311,14 +310,22 @@
                                     * pByte = 0;
                                 }
                                 else if( * pByte == '\n'){
+                                    
+                                    * pByte = 0;
+                                    
                                     _inputState.state = 4;
                                     _inputState.key = 0;
                                     
-                                    NSString * status = [NSString stringWithCString:_inputState.status encoding:NSUTF8StringEncoding];
+                                    CFStringRef version = CFStringCreateWithCString(nil, _inputState.version, kCFStringEncodingUTF8);
                                     
-                                    NSString * version = [NSString stringWithCString:_inputState.version encoding:NSUTF8StringEncoding];
+                                    if(_response){
+                                        CFRelease(_response);
+                                        _response = nil;
+                                    }
                                     
-                                    _response = CFHTTPMessageCreateResponse(nil, atoi(_inputState.statusCode), (CFStringRef) status, (CFStringRef) version);
+                                    _response = CFHTTPMessageCreateResponse(nil, atoi(_inputState.statusCode), nil, version);
+                                    
+                                    CFRelease(version);
                                     
                                 }
                                 else if(_inputState.status ==0){
@@ -485,17 +492,13 @@
                                         [_inputStream close];
                                         [_outputStream close];
                                         
-                                        dispatch_async(dispatch_get_main_queue(), ^{
-                                            
-                                            if(![self isCancelled]){
-                                                [self performSelector:@selector(sendRequest) withObject:nil afterDelay:_idle];
-                                                _idle += _addIdle;
-                                                if(_idle > _maxIdle){
-                                                    _idle = _maxIdle;
-                                                }
+                                        if(![self isCancelled]){
+                                            [self performSelector:@selector(sendRequest) withObject:nil afterDelay:_idle];
+                                            _idle += _addIdle;
+                                            if(_idle > _maxIdle){
+                                                _idle = _maxIdle;
                                             }
-                                            
-                                        });
+                                        }
                                         
                                         return;
                                     }
@@ -641,17 +644,13 @@
                                     [_inputStream close];
                                     [_outputStream close];
                                     
-                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                        
-                                        if(![self isCancelled]){
-                                            [self performSelector:@selector(sendRequest) withObject:nil afterDelay:_idle];
-                                            _idle += _addIdle;
-                                            if(_idle > _maxIdle){
-                                                _idle = _maxIdle;
-                                            }
+                                    if(![self isCancelled]){
+                                        [self performSelector:@selector(sendRequest) withObject:nil afterDelay:_idle];
+                                        _idle += _addIdle;
+                                        if(_idle > _maxIdle){
+                                            _idle = _maxIdle;
                                         }
-                                        
-                                    });
+                                    }
                                     
                                     return;
                                 }

@@ -38,6 +38,13 @@
 			remoteGlobalIDString = 1140D73A177ACD0E009B7F82;
 			remoteInfo = vMessageClient;
 		};
+		ACDBAFA0177DD99E0046331B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = ACC949231777201800F4736B;
+			remoteInfo = vSpeex;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -71,6 +78,7 @@
 		1140D77D177BD3CB009B7F82 /* vMessagePublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessagePublish.m; sourceTree = "<group>"; };
 		1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageBodyPublish.h; sourceTree = "<group>"; };
 		1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageBodyPublish.m; sourceTree = "<group>"; };
+		ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = vSpeex.xcodeproj; path = ../../../vSpeex/vSpeex/vSpeex.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +106,7 @@
 		1140D71D177ACCD1009B7F82 = {
 			isa = PBXGroup;
 			children = (
+				ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */,
 				1140D73E177ACD0E009B7F82 /* vMessageClient */,
 				1140D75C177B02F5009B7F82 /* Sample */,
 				1140D728177ACCD1009B7F82 /* Frameworks */,
@@ -179,6 +188,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		ACDBAF9D177DD99E0046331B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ACDBAFA1177DD99E0046331B /* vSpeex.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -251,6 +268,12 @@
 			mainGroup = 1140D71D177ACCD1009B7F82;
 			productRefGroup = 1140D727177ACCD1009B7F82 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = ACDBAF9D177DD99E0046331B /* Products */;
+					ProjectRef = ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1140D73A177ACD0E009B7F82 /* vMessageClient */,
@@ -258,6 +281,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		ACDBAFA1177DD99E0046331B /* vSpeex.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = vSpeex.framework;
+			remoteRef = ACDBAFA0177DD99E0046331B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1140D739177ACD0E009B7F82 /* Resources */ = {
@@ -501,6 +534,7 @@
 				1140D776177B02F6009B7F82 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
