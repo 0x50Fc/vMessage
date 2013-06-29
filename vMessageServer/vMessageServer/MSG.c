@@ -180,6 +180,21 @@ hbool MSGStringEqual(MSGBuffer * buf,MSGString string,hcchar * cString){
     return p2 && * p2 == 0 && len == 0;
 }
 
+hbool MSGStringHasPrefix(MSGBuffer * buf,MSGString string,hcchar * cString){
+    hchar * p1 = buf->data + string.location;
+    hchar * p2 = (hchar *) cString;
+    huint32 len = string.length;
+    
+    while(p2 && p1 && len >0 && *p1 == * p2){
+        
+        len --;
+        p1 ++;
+        p2 ++;
+    }
+    
+    return p2 && * p2 == 0;
+}
+
 hint32 MSGHttpRequestHeaderIntValue(MSGHttpRequest * request,MSGBuffer * buf,hcchar * key,hint32 defaultValue){
     huint32 c = request->headers.length;
     MSGHttpHeader * h = request->headers.data;

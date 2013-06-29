@@ -28,6 +28,14 @@
 		1140D77F177BD3CB009B7F82 /* vMessagePublish.m in Sources */ = {isa = PBXBuildFile; fileRef = 1140D77D177BD3CB009B7F82 /* vMessagePublish.m */; };
 		1140D782177BDE15009B7F82 /* vMessageBodyPublish.h in Headers */ = {isa = PBXBuildFile; fileRef = 1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1140D783177BDE15009B7F82 /* vMessageBodyPublish.m in Sources */ = {isa = PBXBuildFile; fileRef = 1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */; };
+		ACDBAFE4177E8A420046331B /* vMessageResourcePublish.h in Headers */ = {isa = PBXBuildFile; fileRef = ACDBAFE2177E8A410046331B /* vMessageResourcePublish.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ACDBAFE5177E8A420046331B /* vMessageResourcePublish.m in Sources */ = {isa = PBXBuildFile; fileRef = ACDBAFE3177E8A420046331B /* vMessageResourcePublish.m */; };
+		ACDBAFE8177EAC170046331B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACDBAFE7177EAC170046331B /* AudioToolbox.framework */; };
+		ACDBB011177EAC440046331B /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ACDBAFFB177EAC370046331B /* libogg.a */; };
+		ACDBB012177EAC470046331B /* libspeex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ACDBAFFC177EAC370046331B /* libspeex.a */; };
+		ACDBB013177EAC4A0046331B /* libspeexdsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ACDBAFFD177EAC370046331B /* libspeexdsp.a */; };
+		ACDBB016177ECF390046331B /* vMessageResource.h in Headers */ = {isa = PBXBuildFile; fileRef = ACDBB014177ECF390046331B /* vMessageResource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ACDBB017177ECF390046331B /* vMessageResource.m in Sources */ = {isa = PBXBuildFile; fileRef = ACDBB015177ECF390046331B /* vMessageResource.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +51,13 @@
 			containerPortal = ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = ACC949231777201800F4736B;
+			remoteInfo = vSpeex;
+		};
+		ACDBAFDB177E7D710046331B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = ACC949221777201800F4736B;
 			remoteInfo = vSpeex;
 		};
 /* End PBXContainerItemProxy section */
@@ -79,6 +94,29 @@
 		1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageBodyPublish.h; sourceTree = "<group>"; };
 		1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageBodyPublish.m; sourceTree = "<group>"; };
 		ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = vSpeex.xcodeproj; path = ../../../vSpeex/vSpeex/vSpeex.xcodeproj; sourceTree = "<group>"; };
+		ACDBAFE2177E8A410046331B /* vMessageResourcePublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageResourcePublish.h; sourceTree = "<group>"; };
+		ACDBAFE3177E8A420046331B /* vMessageResourcePublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageResourcePublish.m; sourceTree = "<group>"; };
+		ACDBAFE7177EAC170046331B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		ACDBAFE9177EAC370046331B /* config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = config_types.h; sourceTree = "<group>"; };
+		ACDBAFEA177EAC370046331B /* ogg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = ogg.h; sourceTree = "<group>"; };
+		ACDBAFEB177EAC370046331B /* os_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = os_types.h; sourceTree = "<group>"; };
+		ACDBAFED177EAC370046331B /* speex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex.h; sourceTree = "<group>"; };
+		ACDBAFEE177EAC370046331B /* speex_bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_bits.h; sourceTree = "<group>"; };
+		ACDBAFEF177EAC370046331B /* speex_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_buffer.h; sourceTree = "<group>"; };
+		ACDBAFF0177EAC370046331B /* speex_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_callbacks.h; sourceTree = "<group>"; };
+		ACDBAFF1177EAC370046331B /* speex_config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_config_types.h; sourceTree = "<group>"; };
+		ACDBAFF2177EAC370046331B /* speex_echo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_echo.h; sourceTree = "<group>"; };
+		ACDBAFF3177EAC370046331B /* speex_header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_header.h; sourceTree = "<group>"; };
+		ACDBAFF4177EAC370046331B /* speex_jitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_jitter.h; sourceTree = "<group>"; };
+		ACDBAFF5177EAC370046331B /* speex_preprocess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_preprocess.h; sourceTree = "<group>"; };
+		ACDBAFF6177EAC370046331B /* speex_resampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_resampler.h; sourceTree = "<group>"; };
+		ACDBAFF7177EAC370046331B /* speex_stereo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_stereo.h; sourceTree = "<group>"; };
+		ACDBAFF8177EAC370046331B /* speex_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_types.h; sourceTree = "<group>"; };
+		ACDBAFFB177EAC370046331B /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = file; path = libogg.a; sourceTree = "<group>"; };
+		ACDBAFFC177EAC370046331B /* libspeex.a */ = {isa = PBXFileReference; lastKnownFileType = file; path = libspeex.a; sourceTree = "<group>"; };
+		ACDBAFFD177EAC370046331B /* libspeexdsp.a */ = {isa = PBXFileReference; lastKnownFileType = file; path = libspeexdsp.a; sourceTree = "<group>"; };
+		ACDBB014177ECF390046331B /* vMessageResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageResource.h; sourceTree = "<group>"; };
+		ACDBB015177ECF390046331B /* vMessageResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageResource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,10 +131,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACDBAFE8177EAC170046331B /* AudioToolbox.framework in Frameworks */,
 				1140D77B177B0431009B7F82 /* CFNetwork.framework in Frameworks */,
 				1140D758177B02F5009B7F82 /* UIKit.framework in Frameworks */,
 				1140D759177B02F5009B7F82 /* Foundation.framework in Frameworks */,
 				1140D75B177B02F5009B7F82 /* CoreGraphics.framework in Frameworks */,
+				ACDBB011177EAC440046331B /* libogg.a in Frameworks */,
+				ACDBB012177EAC470046331B /* libspeex.a in Frameworks */,
+				ACDBB013177EAC4A0046331B /* libspeexdsp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +148,7 @@
 		1140D71D177ACCD1009B7F82 = {
 			isa = PBXGroup;
 			children = (
+				ACDBAFFE177EAC370046331B /* lib */,
 				ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */,
 				1140D73E177ACD0E009B7F82 /* vMessageClient */,
 				1140D75C177B02F5009B7F82 /* Sample */,
@@ -126,6 +169,7 @@
 		1140D728177ACCD1009B7F82 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ACDBAFE7177EAC170046331B /* AudioToolbox.framework */,
 				1140D77A177B0431009B7F82 /* CFNetwork.framework */,
 				1140D729177ACCD1009B7F82 /* Foundation.framework */,
 				1140D73C177ACD0E009B7F82 /* CoreFoundation.framework */,
@@ -147,6 +191,10 @@
 				1140D77D177BD3CB009B7F82 /* vMessagePublish.m */,
 				1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */,
 				1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */,
+				ACDBAFE2177E8A410046331B /* vMessageResourcePublish.h */,
+				ACDBAFE3177E8A420046331B /* vMessageResourcePublish.m */,
+				ACDBB014177ECF390046331B /* vMessageResource.h */,
+				ACDBB015177ECF390046331B /* vMessageResource.m */,
 			);
 			path = vMessageClient;
 			sourceTree = "<group>";
@@ -196,6 +244,56 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		ACDBAFEC177EAC370046331B /* ogg */ = {
+			isa = PBXGroup;
+			children = (
+				ACDBAFE9177EAC370046331B /* config_types.h */,
+				ACDBAFEA177EAC370046331B /* ogg.h */,
+				ACDBAFEB177EAC370046331B /* os_types.h */,
+			);
+			path = ogg;
+			sourceTree = "<group>";
+		};
+		ACDBAFF9177EAC370046331B /* speex */ = {
+			isa = PBXGroup;
+			children = (
+				ACDBAFED177EAC370046331B /* speex.h */,
+				ACDBAFEE177EAC370046331B /* speex_bits.h */,
+				ACDBAFEF177EAC370046331B /* speex_buffer.h */,
+				ACDBAFF0177EAC370046331B /* speex_callbacks.h */,
+				ACDBAFF1177EAC370046331B /* speex_config_types.h */,
+				ACDBAFF2177EAC370046331B /* speex_echo.h */,
+				ACDBAFF3177EAC370046331B /* speex_header.h */,
+				ACDBAFF4177EAC370046331B /* speex_jitter.h */,
+				ACDBAFF5177EAC370046331B /* speex_preprocess.h */,
+				ACDBAFF6177EAC370046331B /* speex_resampler.h */,
+				ACDBAFF7177EAC370046331B /* speex_stereo.h */,
+				ACDBAFF8177EAC370046331B /* speex_types.h */,
+			);
+			path = speex;
+			sourceTree = "<group>";
+		};
+		ACDBAFFA177EAC370046331B /* include */ = {
+			isa = PBXGroup;
+			children = (
+				ACDBAFEC177EAC370046331B /* ogg */,
+				ACDBAFF9177EAC370046331B /* speex */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		ACDBAFFE177EAC370046331B /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				ACDBAFFA177EAC370046331B /* include */,
+				ACDBAFFB177EAC370046331B /* libogg.a */,
+				ACDBAFFC177EAC370046331B /* libspeex.a */,
+				ACDBAFFD177EAC370046331B /* libspeexdsp.a */,
+			);
+			name = lib;
+			path = /Users/zhanghailong/Documents/github/vSpeex/vSpeex/../lib;
+			sourceTree = "<absolute>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -207,6 +305,8 @@
 				1140D751177AD1BE009B7F82 /* vMessageClient.h in Headers */,
 				1140D77E177BD3CB009B7F82 /* vMessagePublish.h in Headers */,
 				1140D782177BDE15009B7F82 /* vMessageBodyPublish.h in Headers */,
+				ACDBAFE4177E8A420046331B /* vMessageResourcePublish.h in Headers */,
+				ACDBB016177ECF390046331B /* vMessageResource.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +325,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				ACDBAFDC177E7D710046331B /* PBXTargetDependency */,
 			);
 			name = vMessageClient;
 			productName = vMessageClient;
@@ -324,6 +425,8 @@
 				1140D74E177AD108009B7F82 /* vMessage.m in Sources */,
 				1140D77F177BD3CB009B7F82 /* vMessagePublish.m in Sources */,
 				1140D783177BDE15009B7F82 /* vMessageBodyPublish.m in Sources */,
+				ACDBAFE5177E8A420046331B /* vMessageResourcePublish.m in Sources */,
+				ACDBB017177ECF390046331B /* vMessageResource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,6 +447,11 @@
 			isa = PBXTargetDependency;
 			target = 1140D73A177ACD0E009B7F82 /* vMessageClient */;
 			targetProxy = 1140D777177B02FE009B7F82 /* PBXContainerItemProxy */;
+		};
+		ACDBAFDC177E7D710046331B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = vSpeex;
+			targetProxy = ACDBAFDB177E7D710046331B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -442,7 +550,11 @@
 				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACH_O_TYPE = mh_object;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OTHER_LDFLAGS = "-Objc";
+				OTHER_LDFLAGS = (
+					"-Objc",
+					"-framework",
+					vSpeex,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = framework;
@@ -466,7 +578,11 @@
 				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACH_O_TYPE = mh_object;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OTHER_LDFLAGS = "-Objc";
+				OTHER_LDFLAGS = (
+					"-Objc",
+					"-framework",
+					vSpeex,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = framework;
@@ -480,6 +596,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Sample/Sample-Prefix.pch";
 				INFOPLIST_FILE = "Sample/Sample-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../vSpeex/lib\"",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					vMessageClient,
@@ -496,6 +616,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Sample/Sample-Prefix.pch";
 				INFOPLIST_FILE = "Sample/Sample-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../vSpeex/lib\"",
+				);
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_LDFLAGS = (
 					"-framework",

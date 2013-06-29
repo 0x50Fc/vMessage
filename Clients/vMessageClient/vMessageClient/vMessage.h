@@ -22,6 +22,7 @@
 @property(nonatomic,retain) NSString * contentType;
 @property(nonatomic,assign) NSUInteger contentLength;
 @property(nonatomic,assign) NSTimeInterval timestamp;
+@property(nonatomic,retain) NSString * resourceURI;
 @property(nonatomic,retain) NSData * body;
 @property(nonatomic,readonly) id dataObject;
 

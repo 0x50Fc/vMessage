@@ -20,13 +20,11 @@
 
 -(BOOL) willRequest:(CFHTTPMessageRef) request;
 
--(BOOL) hasSendData;
-
--(void) didHasSpaceStream:(NSOutputStream *) stream;
+-(BOOL) didHasSpaceStream:(NSOutputStream *) stream;
 
 -(void) didFinishResponse:(CFHTTPMessageRef) response;
 
--(void) onDidFailError:(NSError *) error;
+-(void) didFailError:(NSError *) error;
 
 @end
 

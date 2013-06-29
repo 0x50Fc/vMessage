@@ -29,7 +29,8 @@ static void  MSGDatabaseDefaultClose (MSGDatabase * database){
     
 }
 
-static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth * auth,MSGHttpRequest * request,MSGBuffer * sbuf,huint32 dataOffset,MSGBuffer * dbuf){
+static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth * auth
+                                                  ,MSGHttpRequest * request,MSGBuffer * sbuf,huint32 dataOffset,MSGBuffer * dbuf,hcchar * uri){
     
     MSGDatabaseResult rs = MSGDatabaseResultOK;
     
@@ -65,6 +66,10 @@ static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth
     gettimeofday(& tm, NULL);
     
     entity->timestamp = (hdouble)tm.tv_sec + (hdouble) tm.tv_usec / 1000000.0;
+    
+    if(uri){
+        strncpy(entity->uri, uri,sizeof(entity->uri));
+    }
     
     memcpy(dbuf->data + sizeof(MSGDatabaseEntity), sbuf->data + dataOffset, entity->length );
     
@@ -344,12 +349,118 @@ static void MSGDatabaseDefaultCursorClose (MSGDatabase * database,MSGDatabaseCur
     free(cursor);
 }
 
+static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * auth,MSGDatabaseResource * res,hcchar * uri,hcchar * contentType){
+    
+    hchar path[PATH_MAX] , * dir = getenv(MSG_DEFAULT_PATH_ENV);;
+    hchar uuid[128];
+    time_t t = 0;
+    struct stat s;
+    int fno = -1;
+    
+    if(uri){
+        
+        sscanf(uri, "/r/%s",uuid);
+        
+        snprintf(path, sizeof(path),"%s/%s/res/%s",dir,auth->user,uuid);
+        
+        fno = open(path, O_RDONLY);
+        
+        if(fno == -1){
+            return hbool_false;
+        }
+        
+        if(read(fno, res->type, sizeof(res->type)) != sizeof(res->type)){
+            close(fno);
+            return hbool_false;
+        }
+        
+    }
+    else{
+        
+        snprintf(path, sizeof(path),"%s/%s/res",dir,auth->user);
+        
+        if(stat(path, &s) == -1){
+            mkdir(path,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        }
+        
+        while(1){
+            
+            if(t == 0){
+                t = time(NULL);
+            }
+            else{
+                t ++;
+            }
+            
+            sprintf(uuid,"%lx.r",t);
+            
+            snprintf(path, sizeof(path),"%s/%s/res/%s",dir,auth->user,uuid);
+            
+            if(stat(path, &s) == -1){
+                break;
+            }
+        }
+        
+        fno = open(path, O_WRONLY | O_CREAT | O_TRUNC);
+        
+        if(fno == -1){
+            return hbool_false;
+        }
+        
+        fchmod(fno, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        
+        strncpy(res->type, contentType, sizeof(res->type));
+        
+        if(write(fno, res->type, sizeof(res->type)) != sizeof(res->type)){
+            close(fno);
+            unlink(path);
+            return hbool_false;
+        }
+        
+    }
+    
+    snprintf(res->uri, sizeof(res->uri),"/r/%s",uuid);
+    res->fno = fno;
+    
+    return hbool_true;
+}
+
+static void MSGDatabaseDefaultCloseResource (MSGDatabase * database,MSGAuth * auth,MSGDatabaseResource * res){
+    
+    if(res->fno >0){
+        close(res->fno);
+        res->fno = -1;
+    }
+
+}
+
+static void MSGDatabaseDefaultRemoveResource (MSGDatabase * database,MSGAuth * auth,hcchar * uri){
+    
+    hchar path[PATH_MAX] , * dir = getenv(MSG_DEFAULT_PATH_ENV);;
+    hchar uuid[128];
+    
+    if(uri){
+        
+        sscanf(uri, "/r/%s",uuid);
+        
+        snprintf(path, sizeof(path),"%s/%s/res/%s.r",dir,auth->user,uuid);
+        
+        unlink(path);
+        
+    }
+}
+
+
+
 MSGDatabaseClass MSGDatabaseDefaultClass = {
     MSGDatabaseDefaultOpen,
     MSGDatabaseDefaultClose,
     MSGDatabaseDefaultWrite,
     MSGDatabaseDefaultCursorOpen,
     MSGDatabaseDefaultCursorNext,
-    MSGDatabaseDefaultCursorClose
+    MSGDatabaseDefaultCursorClose,
+    MSGDatabaseDefaultOpenResource,
+    MSGDatabaseDefaultCloseResource,
+    MSGDatabaseDefaultRemoveResource
 };
 

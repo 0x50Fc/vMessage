@@ -1,16 +1,19 @@
 //
-//  vMessagePublish.m
+//  vMessageResource.m
 //  vMessageClient
 //
-//  Created by zhang hailong on 13-6-27.
+//  Created by Zhang Hailong on 13-6-29.
 //  Copyright (c) 2013年 hailong.org. All rights reserved.
 //
 
-#import "vMessagePublish.h"
+#import "vMessageResource.h"
 
 #define INPUT_DATA_SIZE  10240
 
-@interface vMessagePublish(){
+#include <sys/stat.h>
+#include <utime.h>
+
+@interface vMessageResource(){
     CFHTTPMessageRef _request;
     CFHTTPMessageRef _response;
     BOOL _executing;
@@ -32,8 +35,13 @@
         const char * status;
         const char * key;
         const char * value;
+        NSUInteger contentLength;
+        NSUInteger bytes;
     } _inputState;
+
     uint8_t _inputData[INPUT_DATA_SIZE];
+    
+    FILE * _file;
 }
 
 @property(retain) NSInputStream * inputStream;
@@ -43,15 +51,17 @@
 
 @end
 
-@implementation vMessagePublish
+@implementation vMessageResource
 
-@synthesize delegate =_delegate;
+@synthesize filePath = _filePath;
 @synthesize client = _client;
-@synthesize to = _to;
+@synthesize uri = _uri;
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
 @synthesize runloop = _runloop;
 @synthesize outputData = _outputData;
+@synthesize delegate = _delegate;
+
 
 -(void) dealloc{
     
@@ -62,58 +72,37 @@
     [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
     [_inputStream setDelegate:nil];
     [_inputStream close];
-
+    
     [_inputStream release];
     [_outputStream release];
     
+    [_runloop release];
+    [_outputData release];
     if(_request){
         CFRelease(_request);
     }
     if(_response){
         CFRelease(_response);
     }
-    [_client release];
-    [_to release];
-    [_outputData release];
-    [_runloop release];
+    [_filePath release];
+    [_uri release];
     [super dealloc];
 }
 
--(id) initWithClient:(vMessageClient *) client to:(NSString *) to{
+-(id) initWithClient:(vMessageClient *) client uri:(NSString *) uri filePath:(NSString *) filePath{
     
-    if(client == nil || [to length] ==0){
+    if(client == nil || [uri length] ==0 || [filePath length] == 0){
         [self autorelease];
         return nil;
     }
     
     if((self = [super init])){
         _client = [client retain];
-        _to = [to retain];
+        _uri = [uri retain];
+        _filePath = [filePath retain];
     }
+    
     return self;
-}
-
--(BOOL) willRequest:(CFHTTPMessageRef) request{
-    return NO;
-}
-
--(BOOL) didHasSpaceStream:(NSOutputStream *) stream{
- 
-    return NO;
-}
-
--(void) didFinishResponse:(CFHTTPMessageRef) response{
-    if([_delegate respondsToSelector:@selector(vMessagePublish:didFinishResponse:)]){
-        [_delegate vMessagePublish:self didFinishResponse:response];
-    }
-    _finished = YES;
-}
-
--(void) didFailError:(NSError *) error{
-    if([_delegate respondsToSelector:@selector(vMessagePublish:didFailError:)]){
-        [_delegate vMessagePublish:self didFailError:error];
-    }
-    _finished = YES;
 }
 
 -(BOOL) isConcurrent{
@@ -124,21 +113,90 @@
     
     if(_request == nil){
         
-        _request = CFHTTPMessageCreateRequest(nil, (CFStringRef)@"POST", (CFURLRef)[NSURL URLWithString:_to relativeToURL:_client.url], (CFStringRef) @"1.1");
+        _request = CFHTTPMessageCreateRequest(nil, (CFStringRef)@"GET", (CFURLRef)[NSURL URLWithString:_uri relativeToURL:_client.url], (CFStringRef) @"1.1");
         
         CFHTTPMessageAddAuthentication(_request, NULL, (CFStringRef) _client.user, (CFStringRef) _client.password, kCFHTTPAuthenticationSchemeBasic, NO);
         
+        struct stat s;
+        char etag[128];
+        
+        if(stat([_filePath UTF8String], &s) != -1){
+            
+            snprintf(etag, sizeof(etag),"W/%lx",s.st_mtimespec.tv_sec);
+            
+            CFHTTPMessageSetHeaderFieldValue(_response, (CFStringRef) @"If-None-Match"
+                                             , (CFStringRef) [NSString stringWithCString:etag encoding:NSUTF8StringEncoding]);
+        
+            _file = fopen([_filePath UTF8String], "ab");
+        }
+        else{
+            _file = fopen([_filePath UTF8String], "wb");
+        }
+        
     }
     
-    return [self willRequest:_request];
+    return YES;
+}
+
+-(BOOL) isFinished{
+    return _finished;
 }
 
 -(BOOL) isExecuting{
     return _executing;
 }
 
--(BOOL) isFinished {
-    return _finished;
+-(void) didResponse:(CFHTTPMessageRef) response{
+    if([_delegate respondsToSelector:@selector(vMessageResource:didResponse:)]){
+        [_delegate vMessageResource:self didResponse:response];
+    }
+}
+
+-(void) didRecvBytes:(NSUInteger ) bytes contentLength:(NSUInteger) contentLength{
+    if([_delegate respondsToSelector:@selector(vMessageResource:didRecvBytes:contentLength:)]){
+        [_delegate vMessageResource:self didRecvBytes:bytes contentLength:contentLength];
+    }
+}
+
+-(void) didFailError:(NSError *) error{
+    
+    if(_file){
+        fclose(_file);
+        _file = NULL;
+    }
+    
+    _finished = YES;
+    if([_delegate respondsToSelector:@selector(vMessageResource:didFailError:)]){
+        [_delegate vMessageResource:self didFailError:error];
+    }
+}
+
+-(void) didFinished{
+    
+    if(_file){
+        fclose(_file);
+        _file = NULL;
+    }
+    
+    CFStringRef c = CFHTTPMessageCopyHeaderFieldValue(_response, (CFStringRef) @"ETag");
+    
+    if(c){
+        
+        struct utimbuf ut = {
+            time(NULL),0
+        };
+        
+        sscanf([(id)c UTF8String], "%lx",&ut.modtime);
+        
+        utime([_filePath UTF8String], &ut);
+        
+        CFRelease(c);
+    }
+    
+    _finished = YES;
+    if([_delegate respondsToSelector:@selector(vMessageResourceDidFinished:)]){
+        [_delegate vMessageResourceDidFinished:self];
+    }
 }
 
 -(void) main{
@@ -146,6 +204,7 @@
     _executing = YES;
     
     @autoreleasepool {
+        
         self.runloop = [NSRunLoop currentRunLoop];
         
         NSURL * url = _client.url;
@@ -173,7 +232,7 @@
                 [_runloop runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
             }
         }
-
+        
     }
     
     _executing = NO;
@@ -225,12 +284,12 @@
                         }
                     }
                     
-                    uint8_t * pByte;
+                    uint8_t * pByte ;
                     
                     while(_inputState.length){
                         
                         pByte = _inputData + _inputState.index;
-
+                        
                         switch (_inputState.state) {
                             case 0:
                             {
@@ -281,7 +340,6 @@
                                     _inputState.state = 4;
                                     _inputState.key = 0;
                                     
-                                    
                                     CFStringRef version = CFStringCreateWithCString(nil, _inputState.version, kCFStringEncodingUTF8);
                                     
                                     if(_response){
@@ -291,8 +349,53 @@
                                     
                                     _response = CFHTTPMessageCreateResponse(nil, atoi(_inputState.statusCode), nil, version);
                                     
-                                   
                                     CFRelease(version);
+                                    
+                                    int statusCode = CFHTTPMessageGetResponseStatusCode(_response);
+                                    
+                                    if(statusCode == 200){
+                                    
+
+                                        
+                                    }
+                                    else if(statusCode == 304){
+                                        
+                                        [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_inputStream setDelegate:nil];
+                                        [_outputStream setDelegate:nil];
+                                        [_inputStream close];
+                                        [_outputStream close];
+                                        
+                                        dispatch_async(dispatch_get_main_queue(), ^{
+                                            if(! _finished){
+                                                [self didFinished];
+                                            }
+                                        });
+                                        
+                                        return;
+                                        
+                                    }
+                                    else{
+                                        
+                                        [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_inputStream setDelegate:nil];
+                                        [_outputStream setDelegate:nil];
+                                        [_inputStream close];
+                                        [_outputStream close];
+                                        
+                                        NSError * error = [NSError errorWithDomain:NSStringFromClass([self class])
+                                                                              code:CFHTTPMessageGetResponseStatusCode(_response) userInfo:nil];
+                                        
+                                        dispatch_async(dispatch_get_main_queue(), ^{
+                                            if(! _finished){
+                                                [self didFailError:error];
+                                            }
+                                        });
+
+                                        return;
+                                    }
                                     
                                 }
                                 else if(_inputState.status ==0){
@@ -319,20 +422,42 @@
                                     _inputState.key = 0;
                                     _inputState.value = 0;
                                     
-                                    [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
-                                    [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
-                                    [_inputStream setDelegate:nil];
-                                    [_outputStream setDelegate:nil];
-                                    [_outputStream close];
-                                    [_inputStream close];
-                                    
                                     dispatch_async(dispatch_get_main_queue(), ^{
                                         if(!_finished){
-                                            [self didFinishResponse:_response];
+                                            [self didResponse:_response];
                                         }
                                     });
                                     
-                                    return;
+                                    CFStringRef c = CFHTTPMessageCopyHeaderFieldValue(_response, (CFStringRef) @"Content-Length");
+                                    
+                                    _inputState.contentLength = 0;
+                                    _inputState.bytes = 0;
+                                    
+                                    if(c){
+                                        _inputState.contentLength = [(id)c intValue];
+                                        
+                                        CFRelease(c);
+                                    }
+                                    
+                                    if(_inputState.contentLength == 0){
+                                        
+                                        [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                        [_inputStream setDelegate:nil];
+                                        [_outputStream setDelegate:nil];
+                                        [_inputStream close];
+                                        [_outputStream close];
+                                        
+                                        dispatch_async(dispatch_get_main_queue(), ^{
+                                            if(! _finished){
+                                                [self didFinished];
+                                            }
+                                        });
+                                        
+                                        return;
+                                        
+                                    }
+                                    
                                 }
                                 else if(_inputState.key == 0){
                                     _inputState.key = (char *) pByte;
@@ -370,14 +495,46 @@
                                 }
                             }
                                 break;
-                            
+                            case 6:
+                            {
+                                int len = MIN(_inputState.length, _inputState.contentLength);
+                                
+                                if(_file){
+                                    len = fwrite(_inputData + _inputState.index, 1, len, _file);
+                                }
+                                
+                                _inputState.contentLength -= len;
+                                
+                                if(_inputState.contentLength == 0){
+                                    
+                                    [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
+                                    [_inputStream setDelegate:nil];
+                                    [_outputStream setDelegate:nil];
+                                    [_inputStream close];
+                                    [_outputStream close];
+                                    
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                        if(! _finished){
+                                            [self didFinished];
+                                        }
+                                    });
+                                    
+                                    return;
+                                }
+                                
+                                _inputState.index += len;
+                                _inputState.length -= len;
+                                
+                                continue;
+                                
+                            }
                             default:
                                 break;
                         }
                         
                         _inputState.index ++;
                         _inputState.length --;
-                        pByte ++;
                     }
                 }
             }
@@ -389,13 +546,11 @@
                 while ([_outputStream hasSpaceAvailable]) {
                     
                     if(_outputState.state == 0){
-                    
+                        
                         CFDataRef data = CFHTTPMessageCopySerializedMessage(_request);
                         
                         NSInteger len = [_outputStream write:CFDataGetBytePtr(data) maxLength:CFDataGetLength(data)];
-                        
-                        //write(STDOUT_FILENO, CFDataGetBytePtr(data), CFDataGetLength(data));
-                        
+                    
                         if(len <=0){
                             [_inputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
                             [_outputStream removeFromRunLoop:_runloop forMode:NSRunLoopCommonModes];
@@ -411,6 +566,7 @@
                                     [self didFailError:error];
                                 }
                             });
+                            return;
                         }
                         
                         if(len < CFDataGetLength(data)){
@@ -420,18 +576,10 @@
                         }
                         else{
                             _outputState.state = 1;
+                            break;
                         }
                         
                         CFRelease(data);
-                    }
-                    else if(_outputState.state == 1){
-                        
-                        if(![self didHasSpaceStream:_outputStream]){
-                            _outputState.state = 2;
-                            
-                            break;
-                        }
-
                     }
                     else {
                         break;
@@ -469,5 +617,6 @@
     }
     
 }
+
 
 @end

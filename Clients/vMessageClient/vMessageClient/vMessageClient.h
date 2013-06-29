@@ -29,7 +29,6 @@
 
 -(void) stop;
 
-
 @end
 
 @protocol vMessageClientDelegate

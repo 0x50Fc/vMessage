@@ -84,12 +84,14 @@
 @synthesize timestamp = _timestamp;
 @synthesize body = _body;
 @synthesize dataObject = _dataObject;
+@synthesize resourceURI = _resourceURI;
 
 -(void) dealloc{
     [_from release];
     [_contentType release];
     [_body release];
     [_dataObject release];
+    [_resourceURI release];
     [super dealloc];
 }
 

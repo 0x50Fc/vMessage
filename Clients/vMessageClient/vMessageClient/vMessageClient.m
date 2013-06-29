@@ -64,6 +64,8 @@
     
     BOOL _executing;
     BOOL _finished;
+    
+    FILE * _resourceFile;
 }
 
 @property(copy) NSURL * url;
@@ -80,6 +82,7 @@
 @property(nonatomic,assign) NSTimeInterval idle;
 @property(nonatomic,assign) NSTimeInterval maxIdle;
 @property(nonatomic,assign) NSTimeInterval addIdle;
+
 
 -(id) initWithURL:(NSURL *) url user:(NSString *) user password:(NSString *) password;
 
@@ -103,7 +106,7 @@
 @synthesize timestamp = _timestamp;
 @synthesize message = _message;
 
--(id) initWithURL:(NSURL *) url user:(NSString *) user password:(NSString *) password;{
+-(id) initWithURL:(NSURL *) url user:(NSString *) user password:(NSString *) password{
     if((self = [super init])){
         self.url = url;
         self.user = user;
@@ -113,6 +116,9 @@
 }
 
 -(void) dealloc{
+    if(_resourceFile){
+        fclose(_resourceFile);
+    }
     if(_response){
         CFRelease(_response);
     }
@@ -259,9 +265,11 @@
                         }
                     }
                     
-                    uint8_t * pByte = _inputData + _inputState.index;
+                    uint8_t * pByte ;
                     
                     while(_inputState.length){
+                        
+                        pByte = _inputData + _inputState.index;
                         
                         switch (_inputState.state) {
                             case 0:
@@ -569,7 +577,14 @@
                                             }
                                             [_message setFrom:[NSString stringWithCString:_inputState.value encoding:NSUTF8StringEncoding]];
                                         }
-                                        
+                                        else if(strcmp(_inputState.key, "Resource-URI") == 0 ){
+                                            if(_message == nil){
+                                                _message = [[vMessage alloc] init];
+                                            }
+                                            if(_inputState.value && * _inputState.value != '\0'){
+                                                [_message setResourceURI:[NSString stringWithCString:_inputState.value encoding:NSUTF8StringEncoding]];
+                                            }
+                                        }
                                     }
                                     
                                     _inputState.state = 8;
@@ -590,10 +605,30 @@
                             {
                                 // chunked body
                                 if(_inputState.contentLength){
+                                    
                                     if(_message.body == nil){
                                         _message.body = [NSMutableData dataWithCapacity:_inputState.contentLength];
                                     }
-                                    [(NSMutableData *) _message.body appendBytes:pByte length:1];
+                                    
+                                    if(_inputState.contentLength <= _inputState.length){
+                                        
+                                        [(NSMutableData *) _message.body appendBytes:pByte length:_inputState.contentLength];
+                                        
+                                        _inputState.length -= _inputState.contentLength;
+                                        _inputState.index += _inputState.contentLength;
+                                        _inputState.contentLength = 0;
+                                        
+                                        continue;
+                                    }
+                                    else{
+                                        [(NSMutableData *) _message.body appendBytes:pByte length:_inputState.length];
+                                        _inputState.index += _inputState.length;
+                                        _inputState.contentLength -= _inputState.length;
+                                        _inputState.length -= _inputState.length;
+                                        
+                                        continue;
+                                    }
+
                                     _inputState.contentLength --;
                                 }
                                 else if(*pByte == '\r'){
@@ -603,6 +638,11 @@
                                     _inputState.key = 0;
                                     _inputState.value = 0;
                                     _inputState.state = 11;
+                                    
+                                    if(_resourceFile){
+                                        fclose(_resourceFile);
+                                        _resourceFile = NULL;
+                                    }
                                     
                                     {
                                         vMessage * msg = self.message;
@@ -693,6 +733,8 @@
                     
                     CFHTTPMessageAddAuthentication(request, nil, (CFStringRef) _user, (CFStringRef) _password, kCFHTTPAuthenticationSchemeBasic, NO);
                     
+                    CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef)@"Accept", (CFStringRef)@"text/html,resource");
+                    
                     CFDataRef data = CFHTTPMessageCopySerializedMessage(request);
                     
                     NSUInteger length = [_outputStream write:CFDataGetBytePtr(data) maxLength:CFDataGetLength(data)];
@@ -781,7 +823,7 @@
     [super dealloc];
 }
 
--(id) initWithURL:(NSURL *) url user:(NSString *) user password:(NSString *) password{
+-(id) initWithURL:(NSURL *) url user:(NSString *) user password:(NSString *) password {
     if((self = [super init])) {
         
         _url = [url retain];
@@ -889,7 +931,6 @@
     if(cnt < 2){
         cnt = 2;
     }
-    [super setMaxConcurrentOperationCount:2];
+    [super setMaxConcurrentOperationCount:cnt];
 }
-
 @end

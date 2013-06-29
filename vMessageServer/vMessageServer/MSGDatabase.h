@@ -18,12 +18,14 @@ extern "C" {
     
 #define MSG_DATABASE_ENTITY_TYPE_SIZE   64
 #define MSG_DATABASE_CURSOR_INDEX_SIZE  1024
-
+#define MSG_DATABASE_RESOURCE_URI_SIZE  128
+    
     struct _MSGDatabaseClass;
     
     typedef struct _MSGDatabaseEntity {
         hchar type[MSG_DATABASE_ENTITY_TYPE_SIZE];
         hchar user[MSG_USER_SIZE];
+        hchar uri[MSG_DATABASE_RESOURCE_URI_SIZE];
         huint32 length;
         hdouble timestamp;
     } MSGDatabaseEntity;
@@ -55,7 +57,19 @@ extern "C" {
     
     typedef void (* MSGDatabaseClose) (MSGDatabase * database);
     
-    typedef MSGDatabaseResult (* MSGDatabaseWrite) (MSGDatabase * database,MSGAuth * auth,MSGHttpRequest * request,MSGBuffer * sbuf,huint32 dataOffset,MSGBuffer * dbuf);
+    typedef struct _MSGDatabaseResource {
+        hchar uri[MSG_DATABASE_RESOURCE_URI_SIZE];
+        hchar type[MSG_DATABASE_ENTITY_TYPE_SIZE];
+        int fno;
+    } MSGDatabaseResource;
+    
+    typedef hbool (* MSGDatabaseOpenResource) (MSGDatabase * database,MSGAuth * auth,MSGDatabaseResource * res,hcchar * uri,hcchar * contentType);
+    
+    typedef void (* MSGDatabaseCloseResource) (MSGDatabase * database,MSGAuth * auth,MSGDatabaseResource * res);
+    
+    typedef void (* MSGDatabaseRemoveResource) (MSGDatabase * database,MSGAuth * auth,hcchar * uri);
+    
+    typedef MSGDatabaseResult (* MSGDatabaseWrite) (MSGDatabase * database,MSGAuth * auth,MSGHttpRequest * request,MSGBuffer * sbuf,huint32 dataOffset,MSGBuffer * dbuf,hcchar * uri);
     
     typedef MSGDatabaseCursor * (* MSGDatabaseCursorOpen) (MSGDatabase * database,MSGAuth * auth,MSGHttpRequest * request,MSGBuffer * sbuf);
     
@@ -70,6 +84,9 @@ extern "C" {
         MSGDatabaseCursorOpen cursorOpen;
         MSGDatabaseCursorNext cursorNext;
         MSGDatabaseCursorClose cursorClose;
+        MSGDatabaseOpenResource openResource;
+        MSGDatabaseCloseResource closeResource;
+        MSGDatabaseRemoveResource removeResource;
     } MSGDatabaseClass;
     
     extern MSGDatabaseResult MSGDatabaseResultOK;

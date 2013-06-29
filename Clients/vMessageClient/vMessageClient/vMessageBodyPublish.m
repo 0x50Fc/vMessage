@@ -107,8 +107,7 @@
     return YES;
 }
 
--(BOOL) hasSendData{
-    
+-(BOOL) didHasSpaceStream:(NSOutputStream *)stream{
     return NO;
 }
 
