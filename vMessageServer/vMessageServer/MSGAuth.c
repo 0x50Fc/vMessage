@@ -53,6 +53,9 @@ static MSGAuth * MSGAuthDefaultCreate (struct _MSGAuthClass * clazz,MSGHttpReque
             
             snprintf(buf, sizeof(buf),"%s/%s",path,user);
             
+            printf("\nAuth Path:\n");
+            printf("%s\n",buf);
+            
             if(stat(buf, &s) != -1 && S_ISDIR(s.st_mode)){
                 
                 snprintf(buf, sizeof(buf), "%s/%s/cfg.ini",path,user);

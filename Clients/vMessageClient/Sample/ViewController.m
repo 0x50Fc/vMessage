@@ -23,7 +23,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    self.client = [[[vMessageClient alloc] initWithURL:[NSURL URLWithString:@"http://192.168.1.102:52121"] user:@"hailong" password:@"12345678"] autorelease];
+    self.client = [[[vMessageClient alloc] initWithURL:[NSURL URLWithString:@"http://www.9vteam.com:9777"] user:@"hailong" password:@"12345678"] autorelease];
     
     [_client setMaxConcurrentOperationCount:10];
     [_client setDelegate:self];
