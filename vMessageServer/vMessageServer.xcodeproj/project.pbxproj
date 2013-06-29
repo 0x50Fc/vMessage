@@ -66,6 +66,7 @@
 		11237F6F1774113D002D95F0 /* MSGAuth.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F6E1774113D002D95F0 /* MSGAuth.c */; };
 		11237F7217741402002D95F0 /* MSGDatabase.c in Sources */ = {isa = PBXBuildFile; fileRef = 11237F7117741402002D95F0 /* MSGDatabase.c */; };
 		1140D718177AB9FD009B7F82 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1140D717177AB9FD009B7F82 /* libssl.dylib */; };
+		AC11CDEE177F0B140001BFF2 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = AC11CDED177F0B140001BFF2 /* Makefile */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -210,6 +211,7 @@
 		1140D717177AB9FD009B7F82 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 		1140D71A177ABEB5009B7F82 /* sina.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = sina.py; sourceTree = "<group>"; };
 		1140D71C177AC2A1009B7F82 /* sina.xsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sina.xsl; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xml; };
+		AC11CDED177F0B140001BFF2 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -260,6 +262,7 @@
 				11237F70177413FA002D95F0 /* MSGDatabase.h */,
 				11237F7117741402002D95F0 /* MSGDatabase.c */,
 				1103276E1779707400759A85 /* client.html */,
+				AC11CDED177F0B140001BFF2 /* Makefile */,
 			);
 			path = vMessageServer;
 			sourceTree = "<group>";
@@ -544,6 +547,7 @@
 				11237F6B1773F5C4002D95F0 /* MSG.c in Sources */,
 				11237F6F1774113D002D95F0 /* MSGAuth.c in Sources */,
 				11237F7217741402002D95F0 /* MSGDatabase.c in Sources */,
+				AC11CDEE177F0B140001BFF2 /* Makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
