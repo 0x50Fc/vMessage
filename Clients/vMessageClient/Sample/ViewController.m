@@ -76,6 +76,9 @@
 
 -(void) vMessageClient:(vMessageClient *) client didFailError:(NSError *) error{
     NSLog(@"%@",error);
+    [client stop];
+    [client performSelector:@selector(start) withObject:nil afterDelay:1.2];
+    
 }
 
 - (void)dealloc {

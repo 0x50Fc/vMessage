@@ -10,6 +10,8 @@
 
 #import "ViewController.h"
 
+#import <AudioToolbox/AudioToolbox.h>
+
 @implementation AppDelegate
 
 - (void)dealloc
@@ -21,6 +23,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.
     self.viewController = [[[ViewController alloc] initWithNibName:@"ViewController" bundle:nil] autorelease];
