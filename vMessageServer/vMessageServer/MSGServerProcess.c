@@ -462,6 +462,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                     struct stat s;
                                     hbool isOK = 0;
                                     hchar etag[128];
+                                    ssize_t len;
                                     
                                     * (sbuf.data + request.path.location + request.path.length) = 0;
                                     
@@ -501,7 +502,12 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                                 while (1) {
                                                     
                                                     if(sbuf.length == 0){
-                                                        sbuf.length = read(res.fno, sbuf.data, sbuf.size);
+                                                        len = read(res.fno, sbuf.data, sbuf.size);
+                                                        offset= 0;
+                                                        if(len <=0){
+                                                            break;
+                                                        }
+                                                        sbuf.length = (huint32) len;
                                                         offset= 0;
                                                         if(sbuf.length ==0){
                                                             break;

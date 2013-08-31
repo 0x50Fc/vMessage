@@ -13,6 +13,8 @@
 #include "hbase64.h"
 #include "hinifile.h"
 
+#include "hserver.h"
+
 static MSGAuth * MSGAuthDefaultCreate (struct _MSGAuthClass * clazz,MSGHttpRequest * request,MSGBuffer * sbuf){
     
     MSGAuth * auth = NULL;
@@ -53,8 +55,8 @@ static MSGAuth * MSGAuthDefaultCreate (struct _MSGAuthClass * clazz,MSGHttpReque
             
             snprintf(buf, sizeof(buf),"%s/%s",path,user);
             
-            printf("\nAuth Path:\n");
-            printf("%s\n",buf);
+            SRVServerLog("\nAuth Path:\n");
+            SRVServerLog("%s\n",buf);
             
             if(stat(buf, &s) != -1 && S_ISDIR(s.st_mode)){
                 
