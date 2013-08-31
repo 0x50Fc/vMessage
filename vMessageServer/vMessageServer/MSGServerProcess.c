@@ -547,6 +547,28 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                 }
                                 
                             }
+                            else if(MSGStringHasPrefix(&sbuf, request.path, "/timestamp")){
+                                
+                                {
+                                    struct timeval tv;
+                                    double timestamp;
+                                    
+                                    gettimeofday(& tv, NULL);
+                                    
+                                    timestamp = (hdouble)tv.tv_sec + (hdouble) tv.tv_usec / 1000000.0;
+                                    
+                                    state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
+                                    
+                                    if(state == StreamStateOK){
+                                        
+                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: %s\r\nTimestamp: %lf\r\n\r\n",MSGAllowOrigin,timestamp);
+                                        
+                                        stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                                        
+                                    }
+                                }
+                                
+                            }
                             else{
                             
                                 MSGDatabaseCursor * cursor = ( * MSGServerProcess.databaseClass->cursorOpen)(database,auth,&request,&sbuf);

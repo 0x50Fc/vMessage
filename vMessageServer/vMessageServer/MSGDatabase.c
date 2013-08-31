@@ -353,7 +353,7 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
     
     hchar path[PATH_MAX] , * dir = getenv(MSG_DEFAULT_PATH_ENV);;
     hchar uuid[128];
-    time_t t = 0;
+    struct timeval tv = {0,0};
     struct stat s;
     int fno = -1;
     
@@ -385,14 +385,14 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
         
         while(1){
             
-            if(t == 0){
-                t = time(NULL);
+            if(tv.tv_sec == 0){
+                gettimeofday(&tv, NULL);
             }
             else{
-                t ++;
+                tv.tv_usec ++;
             }
             
-            sprintf(uuid,"%lx.r",t);
+            sprintf(uuid,"%lx%x.r",tv.tv_sec,tv.tv_usec);
             
             snprintf(path, sizeof(path),"%s/%s/res/%s",dir,auth->user,uuid);
             
