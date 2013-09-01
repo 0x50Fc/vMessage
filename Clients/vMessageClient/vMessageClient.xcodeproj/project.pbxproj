@@ -28,6 +28,9 @@
 		1140D77F177BD3CB009B7F82 /* vMessagePublish.m in Sources */ = {isa = PBXBuildFile; fileRef = 1140D77D177BD3CB009B7F82 /* vMessagePublish.m */; };
 		1140D782177BDE15009B7F82 /* vMessageBodyPublish.h in Headers */ = {isa = PBXBuildFile; fileRef = 1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1140D783177BDE15009B7F82 /* vMessageBodyPublish.m in Sources */ = {isa = PBXBuildFile; fileRef = 1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */; };
+		AC84E5A817D1D0DC002D1405 /* vMessageReceive.h in Headers */ = {isa = PBXBuildFile; fileRef = AC84E5A617D1D0DC002D1405 /* vMessageReceive.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AC84E5A917D1D0DC002D1405 /* vMessageReceive.m in Sources */ = {isa = PBXBuildFile; fileRef = AC84E5A717D1D0DC002D1405 /* vMessageReceive.m */; };
+		AC84E5AA17D1D0DC002D1405 /* vMessageReceive.m in Sources */ = {isa = PBXBuildFile; fileRef = AC84E5A717D1D0DC002D1405 /* vMessageReceive.m */; };
 		ACDBAFE4177E8A420046331B /* vMessageResourcePublish.h in Headers */ = {isa = PBXBuildFile; fileRef = ACDBAFE2177E8A410046331B /* vMessageResourcePublish.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		ACDBAFE5177E8A420046331B /* vMessageResourcePublish.m in Sources */ = {isa = PBXBuildFile; fileRef = ACDBAFE3177E8A420046331B /* vMessageResourcePublish.m */; };
 		ACDBAFE8177EAC170046331B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACDBAFE7177EAC170046331B /* AudioToolbox.framework */; };
@@ -93,28 +96,30 @@
 		1140D77D177BD3CB009B7F82 /* vMessagePublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessagePublish.m; sourceTree = "<group>"; };
 		1140D780177BDE15009B7F82 /* vMessageBodyPublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageBodyPublish.h; sourceTree = "<group>"; };
 		1140D781177BDE15009B7F82 /* vMessageBodyPublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageBodyPublish.m; sourceTree = "<group>"; };
+		AC84E5A617D1D0DC002D1405 /* vMessageReceive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageReceive.h; sourceTree = "<group>"; };
+		AC84E5A717D1D0DC002D1405 /* vMessageReceive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageReceive.m; sourceTree = "<group>"; };
 		ACDBAF9C177DD99E0046331B /* vSpeex.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = vSpeex.xcodeproj; path = ../../../vSpeex/vSpeex/vSpeex.xcodeproj; sourceTree = "<group>"; };
 		ACDBAFE2177E8A410046331B /* vMessageResourcePublish.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageResourcePublish.h; sourceTree = "<group>"; };
 		ACDBAFE3177E8A420046331B /* vMessageResourcePublish.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageResourcePublish.m; sourceTree = "<group>"; };
 		ACDBAFE7177EAC170046331B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		ACDBAFE9177EAC370046331B /* config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = config_types.h; sourceTree = "<group>"; };
-		ACDBAFEA177EAC370046331B /* ogg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = ogg.h; sourceTree = "<group>"; };
-		ACDBAFEB177EAC370046331B /* os_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = os_types.h; sourceTree = "<group>"; };
-		ACDBAFED177EAC370046331B /* speex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex.h; sourceTree = "<group>"; };
-		ACDBAFEE177EAC370046331B /* speex_bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_bits.h; sourceTree = "<group>"; };
-		ACDBAFEF177EAC370046331B /* speex_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_buffer.h; sourceTree = "<group>"; };
-		ACDBAFF0177EAC370046331B /* speex_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_callbacks.h; sourceTree = "<group>"; };
-		ACDBAFF1177EAC370046331B /* speex_config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_config_types.h; sourceTree = "<group>"; };
-		ACDBAFF2177EAC370046331B /* speex_echo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_echo.h; sourceTree = "<group>"; };
-		ACDBAFF3177EAC370046331B /* speex_header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_header.h; sourceTree = "<group>"; };
-		ACDBAFF4177EAC370046331B /* speex_jitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_jitter.h; sourceTree = "<group>"; };
-		ACDBAFF5177EAC370046331B /* speex_preprocess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_preprocess.h; sourceTree = "<group>"; };
-		ACDBAFF6177EAC370046331B /* speex_resampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_resampler.h; sourceTree = "<group>"; };
-		ACDBAFF7177EAC370046331B /* speex_stereo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_stereo.h; sourceTree = "<group>"; };
-		ACDBAFF8177EAC370046331B /* speex_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; path = speex_types.h; sourceTree = "<group>"; };
-		ACDBAFFB177EAC370046331B /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = file; path = libogg.a; sourceTree = "<group>"; };
-		ACDBAFFC177EAC370046331B /* libspeex.a */ = {isa = PBXFileReference; lastKnownFileType = file; path = libspeex.a; sourceTree = "<group>"; };
-		ACDBAFFD177EAC370046331B /* libspeexdsp.a */ = {isa = PBXFileReference; lastKnownFileType = file; path = libspeexdsp.a; sourceTree = "<group>"; };
+		ACDBAFE9177EAC370046331B /* config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config_types.h; sourceTree = "<group>"; };
+		ACDBAFEA177EAC370046331B /* ogg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogg.h; sourceTree = "<group>"; };
+		ACDBAFEB177EAC370046331B /* os_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = os_types.h; sourceTree = "<group>"; };
+		ACDBAFED177EAC370046331B /* speex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex.h; sourceTree = "<group>"; };
+		ACDBAFEE177EAC370046331B /* speex_bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_bits.h; sourceTree = "<group>"; };
+		ACDBAFEF177EAC370046331B /* speex_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_buffer.h; sourceTree = "<group>"; };
+		ACDBAFF0177EAC370046331B /* speex_callbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_callbacks.h; sourceTree = "<group>"; };
+		ACDBAFF1177EAC370046331B /* speex_config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_config_types.h; sourceTree = "<group>"; };
+		ACDBAFF2177EAC370046331B /* speex_echo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_echo.h; sourceTree = "<group>"; };
+		ACDBAFF3177EAC370046331B /* speex_header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_header.h; sourceTree = "<group>"; };
+		ACDBAFF4177EAC370046331B /* speex_jitter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_jitter.h; sourceTree = "<group>"; };
+		ACDBAFF5177EAC370046331B /* speex_preprocess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_preprocess.h; sourceTree = "<group>"; };
+		ACDBAFF6177EAC370046331B /* speex_resampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_resampler.h; sourceTree = "<group>"; };
+		ACDBAFF7177EAC370046331B /* speex_stereo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_stereo.h; sourceTree = "<group>"; };
+		ACDBAFF8177EAC370046331B /* speex_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speex_types.h; sourceTree = "<group>"; };
+		ACDBAFFB177EAC370046331B /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libogg.a; sourceTree = "<group>"; };
+		ACDBAFFC177EAC370046331B /* libspeex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libspeex.a; sourceTree = "<group>"; };
+		ACDBAFFD177EAC370046331B /* libspeexdsp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libspeexdsp.a; sourceTree = "<group>"; };
 		ACDBB014177ECF390046331B /* vMessageResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vMessageResource.h; sourceTree = "<group>"; };
 		ACDBB015177ECF390046331B /* vMessageResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vMessageResource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -195,6 +200,8 @@
 				ACDBAFE3177E8A420046331B /* vMessageResourcePublish.m */,
 				ACDBB014177ECF390046331B /* vMessageResource.h */,
 				ACDBB015177ECF390046331B /* vMessageResource.m */,
+				AC84E5A617D1D0DC002D1405 /* vMessageReceive.h */,
+				AC84E5A717D1D0DC002D1405 /* vMessageReceive.m */,
 			);
 			path = vMessageClient;
 			sourceTree = "<group>";
@@ -307,6 +314,7 @@
 				1140D782177BDE15009B7F82 /* vMessageBodyPublish.h in Headers */,
 				ACDBAFE4177E8A420046331B /* vMessageResourcePublish.h in Headers */,
 				ACDBB016177ECF390046331B /* vMessageResource.h in Headers */,
+				AC84E5A817D1D0DC002D1405 /* vMessageReceive.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -427,6 +435,7 @@
 				1140D783177BDE15009B7F82 /* vMessageBodyPublish.m in Sources */,
 				ACDBAFE5177E8A420046331B /* vMessageResourcePublish.m in Sources */,
 				ACDBB017177ECF390046331B /* vMessageResource.m in Sources */,
+				AC84E5A917D1D0DC002D1405 /* vMessageReceive.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,6 +446,7 @@
 				1140D763177B02F6009B7F82 /* main.m in Sources */,
 				1140D767177B02F6009B7F82 /* AppDelegate.m in Sources */,
 				1140D770177B02F6009B7F82 /* ViewController.m in Sources */,
+				AC84E5AA17D1D0DC002D1405 /* vMessageReceive.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

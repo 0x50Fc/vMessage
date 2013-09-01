@@ -12,6 +12,6 @@
 
 @property(nonatomic,retain) id body;
 
--(id) initWithClient:(vMessageClient *) client to:(NSString *) to body:(id) body;
+-(id) initWithSession:(NSString *)session body:(id) body;
 
 @end

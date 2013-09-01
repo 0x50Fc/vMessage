@@ -8,6 +8,8 @@
 
 #import "vMessage.h"
 
+#include <objc/runtime.h>
+
 @implementation NSString (vMessage)
 
 -(NSString *) stringByAddingMessageEscapes{
@@ -97,7 +99,7 @@
 
 -(id) dataObject{
     if(_dataObject == nil){
-        if([_contentType isEqualToString:@"application/x-www-form-urlencoded"] && _body){
+        if((_resourceURI && [_contentType isEqualToString:@"application/x-www-form-urlencoded"]) && _body){
             NSString * text = [[NSString alloc] initWithData:_body encoding:NSUTF8StringEncoding];
             _dataObject = [[NSMutableDictionary alloc] initWithCapacity:4];
             NSArray * items = [text componentsSeparatedByString:@"&"];
@@ -111,6 +113,93 @@
         }
     }
     return _dataObject;
+}
+
++(id) dataObjectFromString:(NSString *) string{
+    
+    NSMutableDictionary * dataObject = [NSMutableDictionary dictionaryWithCapacity:4];
+    
+    NSArray * items = [string componentsSeparatedByString:@"&"];
+    for(NSString * item in items){
+        NSArray * kv = [item componentsSeparatedByString:@"="];
+        if([kv count] == 2){
+            [dataObject setValue:[[kv objectAtIndex:1] stringByReplacingMessageEscapes] forKey:[kv objectAtIndex:0]];
+        }
+    }
+    
+    return dataObject;
+}
+
++(NSString *) stringFromDataObject:(id) dataObject{
+    
+    NSMutableString * string = [NSMutableString stringWithCapacity:64];
+    
+    if([dataObject isKindOfClass:[NSDictionary class]]){
+        
+        for(NSString * key in dataObject){
+            
+            id v = [dataObject valueForKey:key];
+            
+            [string appendFormat:@"&%@=",key];
+            
+            if([v isKindOfClass:[NSString class]]){
+                [string appendString:[v stringByAddingMessageEscapes]];
+            }
+            else if([v isKindOfClass:[NSNull class]]){
+                
+            }
+            else if([v isKindOfClass:[NSNumber class]]){
+                [string appendFormat:@"%@",v];
+            }
+            else if(v){
+                [string appendString:[v description]];
+            }
+        }
+        
+    }
+    else if(dataObject){
+        Class cls = [dataObject class];
+        while(cls && cls != [NSObject class]){
+            
+            unsigned int count = 0;
+            objc_property_t * prop = class_copyPropertyList(cls, &count);
+            
+            for(int i=0;i<count;i++){
+                
+                NSString * key = [NSString stringWithCString:property_getName(prop[i]) encoding:NSUTF8StringEncoding];
+                
+                [string appendFormat:@"&%@=",key];
+                
+                id v = nil;
+                @try {
+                    v = [dataObject valueForKey:key];
+                }
+                @catch (NSException *exception) {
+                    v = nil;
+                }
+                
+                if([v isKindOfClass:[NSString class]]){
+                    [string appendString:[v stringByAddingMessageEscapes]];
+                }
+                else if([v isKindOfClass:[NSNull class]]){
+                    
+                }
+                else if([v isKindOfClass:[NSNumber class]]){
+                    [string appendFormat:@"%@",v];
+                }
+                else if(v){
+                    [string appendString:[v description]];
+                }
+            
+            }
+            
+            free(prop);
+            
+            cls = class_getSuperclass(cls);
+        }
+    }
+    
+    return string;
 }
 
 @end

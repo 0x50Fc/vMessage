@@ -46,8 +46,7 @@
 @implementation vMessagePublish
 
 @synthesize delegate =_delegate;
-@synthesize client = _client;
-@synthesize to = _to;
+@synthesize session = _session;
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
 @synthesize runloop = _runloop;
@@ -72,24 +71,23 @@
     if(_response){
         CFRelease(_response);
     }
-    [_client release];
-    [_to release];
+    [_session release];
     [_outputData release];
     [_runloop release];
     [super dealloc];
 }
 
--(id) initWithClient:(vMessageClient *) client to:(NSString *) to{
+-(id) initWithSession:(NSString *) session{
     
-    if(client == nil || [to length] ==0){
+    if([session length] ==0){
         [self autorelease];
         return nil;
     }
     
     if((self = [super init])){
-        _client = [client retain];
-        _to = [to retain];
+        _session = [session retain];
     }
+    
     return self;
 }
 
@@ -120,17 +118,8 @@
     return YES;
 }
 
--(BOOL) isReady{
-    
-    if(_request == nil){
-        
-        _request = CFHTTPMessageCreateRequest(nil, (CFStringRef)@"POST", (CFURLRef)[NSURL URLWithString:_to relativeToURL:_client.url], (CFStringRef) @"1.1");
-        
-        CFHTTPMessageAddAuthentication(_request, NULL, (CFStringRef) _client.user, (CFStringRef) _client.password, kCFHTTPAuthenticationSchemeBasic, NO);
-        
-    }
-    
-    return [self willRequest:_request];
+-(BOOL) isReady{    
+    return YES;
 }
 
 -(BOOL) isExecuting{
@@ -146,9 +135,25 @@
     _executing = YES;
     
     @autoreleasepool {
+      
         self.runloop = [NSRunLoop currentRunLoop];
         
-        NSURL * url = _client.url;
+        vMessageClient * client = [NSOperationQueue currentQueue];
+        
+        if(_request == nil){
+            
+            _request = CFHTTPMessageCreateRequest(nil, (CFStringRef)@"POST", (CFURLRef)[NSURL URLWithString:_session relativeToURL:client.url], (CFStringRef) @"1.1");
+            
+            CFHTTPMessageAddAuthentication(_request, NULL, (CFStringRef) client.user, (CFStringRef) client.password, kCFHTTPAuthenticationSchemeBasic, NO);
+            
+        }
+        
+        if(! [self willRequest:_request]){
+            _executing = NO;
+            return;
+        }
+        
+        NSURL * url = client.url;
         NSString * host = [url host];
         NSUInteger port = [[url port] unsignedIntValue];
         

@@ -13,11 +13,10 @@
 @interface vMessageResource : NSOperation<NSStreamDelegate>
 
 @property(nonatomic,readonly) NSString * filePath;
-@property(nonatomic,readonly) vMessageClient * client;
 @property(nonatomic,readonly) NSString * uri;
 @property(nonatomic,unsafe_unretained) id delegate;
 
--(id) initWithClient:(vMessageClient *) client uri:(NSString *) uri filePath:(NSString *) filePath;
+-(id) initWithUri:(NSString *) uri filePath:(NSString *) filePath;
 
 -(void) didResponse:(CFHTTPMessageRef) response;
 

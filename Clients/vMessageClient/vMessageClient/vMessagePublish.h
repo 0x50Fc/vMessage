@@ -12,11 +12,10 @@
 
 @interface vMessagePublish : NSOperation<NSStreamDelegate>
 
-@property(nonatomic,readonly) vMessageClient * client;
 @property(nonatomic,unsafe_unretained) id delegate;
-@property(nonatomic,readonly) NSString * to;
+@property(nonatomic,readonly) NSString * session;
 
--(id) initWithClient:(vMessageClient *) client to:(NSString *) to;
+-(id) initWithSession:(NSString *) session;
 
 -(BOOL) willRequest:(CFHTTPMessageRef) request;
 

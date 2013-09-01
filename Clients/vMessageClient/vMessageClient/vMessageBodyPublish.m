@@ -28,14 +28,14 @@
     [super dealloc];
 }
 
--(id) initWithClient:(vMessageClient *) client to:(NSString *) to body:(id) body{
+-(id) initWithSession:(NSString *)session body:(id) body;{
     
     if(body == nil){
         [self autorelease];
         return nil;
     }
     
-    if((self = [super initWithClient:client to:to])){
+    if((self = [super initWithSession:session])){
         _body = [body retain];
         if([body isKindOfClass:[NSString class]]){
             self.bodyBytes = [(NSString *)body dataUsingEncoding:NSUTF8StringEncoding];

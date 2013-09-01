@@ -54,7 +54,6 @@
 @implementation vMessageResource
 
 @synthesize filePath = _filePath;
-@synthesize client = _client;
 @synthesize uri = _uri;
 @synthesize inputStream = _inputStream;
 @synthesize outputStream = _outputStream;
@@ -89,15 +88,14 @@
     [super dealloc];
 }
 
--(id) initWithClient:(vMessageClient *) client uri:(NSString *) uri filePath:(NSString *) filePath{
+-(id) initWithUri:(NSString *) uri filePath:(NSString *) filePath{
     
-    if(client == nil || [uri length] ==0 || [filePath length] == 0){
+    if([uri length] ==0 || [filePath length] == 0){
         [self autorelease];
         return nil;
     }
     
     if((self = [super init])){
-        _client = [client retain];
         _uri = [uri retain];
         _filePath = [filePath retain];
     }
@@ -109,32 +107,7 @@
     return YES;
 }
 
--(BOOL) isReady{
-    
-    if(_request == nil){
-        
-        _request = CFHTTPMessageCreateRequest(nil, (CFStringRef)@"GET", (CFURLRef)[NSURL URLWithString:_uri relativeToURL:_client.url], (CFStringRef) @"1.1");
-        
-        CFHTTPMessageAddAuthentication(_request, NULL, (CFStringRef) _client.user, (CFStringRef) _client.password, kCFHTTPAuthenticationSchemeBasic, NO);
-        
-        struct stat s;
-        char etag[128];
-        
-        if(stat([_filePath UTF8String], &s) != -1){
-            
-            snprintf(etag, sizeof(etag),"W/%lx",s.st_mtimespec.tv_sec);
-            
-            CFHTTPMessageSetHeaderFieldValue(_response, (CFStringRef) @"If-None-Match"
-                                             , (CFStringRef) [NSString stringWithCString:etag encoding:NSUTF8StringEncoding]);
-        
-            _file = fopen([_filePath UTF8String], "ab");
-        }
-        else{
-            _file = fopen([_filePath UTF8String], "wb");
-        }
-        
-    }
-    
+-(BOOL) isReady{    
     return YES;
 }
 
@@ -207,7 +180,33 @@
         
         self.runloop = [NSRunLoop currentRunLoop];
         
-        NSURL * url = _client.url;
+        vMessageClient * client = [NSOperationQueue currentQueue];
+        
+        if(_request == nil){
+            
+            _request = CFHTTPMessageCreateRequest(nil, (CFStringRef)@"GET", (CFURLRef)[NSURL URLWithString:_uri relativeToURL:client.url], (CFStringRef) @"1.1");
+            
+            CFHTTPMessageAddAuthentication(_request, NULL, (CFStringRef) client.user, (CFStringRef) client.password, kCFHTTPAuthenticationSchemeBasic, NO);
+            
+            struct stat s;
+            char etag[128];
+            
+            if(stat([_filePath UTF8String], &s) != -1){
+                
+                snprintf(etag, sizeof(etag),"W/%lx",s.st_mtimespec.tv_sec);
+                
+                CFHTTPMessageSetHeaderFieldValue(_response, (CFStringRef) @"If-None-Match"
+                                                 , (CFStringRef) [NSString stringWithCString:etag encoding:NSUTF8StringEncoding]);
+                
+                _file = fopen([_filePath UTF8String], "ab");
+            }
+            else{
+                _file = fopen([_filePath UTF8String], "wb");
+            }
+            
+        }
+        
+        NSURL * url = client.url;
         NSString * host = [url host];
         NSUInteger port = [[url port] unsignedIntValue];
         

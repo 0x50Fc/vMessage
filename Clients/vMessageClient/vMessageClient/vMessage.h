@@ -26,4 +26,8 @@
 @property(nonatomic,retain) NSData * body;
 @property(nonatomic,readonly) id dataObject;
 
++(id) dataObjectFromString:(NSString *) string;
+
++(NSString *) stringFromDataObject:(id) dataObject;
+
 @end

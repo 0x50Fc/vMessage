@@ -383,6 +383,14 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                                 
                                 if(POSTDataOK){
                                     
+                                    h = MSGHttpRequestGetHeader(& request, & sbuf, "URL-Encoded");
+                                    
+                                    if(h){
+                                        MSGBufferExpandSize(& sbuf, offset + h->value.length);
+                                        memcpy(sbuf.data + offset, sbuf.data + h->value.location, h->value.length);
+                                        sbuf.length = offset + h->value.length;
+                                    }
+                                    
                                     dbResult = ( * MSGServerProcess.databaseClass->write)(database,auth,& request,& sbuf,offset,&dbuf,uri);
                                     
                                     (* MSGServerProcess.databaseClass->close)(database);

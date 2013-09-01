@@ -30,6 +30,7 @@
 @synthesize filePath = _filePath;
 @synthesize fileEOF = _fileEOF;
 @synthesize contentType = _contentType;
+@synthesize urlencoded = _urlencoded;
 
 -(void) dealloc{
     if(_fno >0){
@@ -37,12 +38,13 @@
     }
     [_filePath release];
     [_contentType release];
+    [_urlencoded release];
     [super dealloc];
 }
 
--(id) initWithClient:(vMessageClient *) client to:(NSString *) to filePath:(NSString *) filePath{
+-(id) initWithSession:(NSString *)session filePath:(NSString *) filePath{
     
-    if((self = [super initWithClient:client to:to])){
+    if((self = [super initWithSession:session])){
         
         _fileEOF = YES;
         
@@ -67,6 +69,9 @@
     CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef) @"Transfer-Encoding"
                                      , (CFStringRef) @"chunked");
     
+    if(_urlencoded){
+        CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef) @"URL-Encoded", (CFStringRef) _urlencoded);
+    }
     
     return YES;
 }

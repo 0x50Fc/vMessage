@@ -13,7 +13,8 @@
 @property(nonatomic,retain) NSString * filePath;
 @property(nonatomic,assign,getter = isFileEOF) BOOL fileEOF;
 @property(nonatomic,retain) NSString * contentType;
+@property(nonatomic,retain) NSString * urlencoded;
 
--(id) initWithClient:(vMessageClient *) client to:(NSString *) to filePath:(NSString *) filePath;
+-(id) initWithSession:(NSString *)session filePath:(NSString *) filePath;
 
 @end
