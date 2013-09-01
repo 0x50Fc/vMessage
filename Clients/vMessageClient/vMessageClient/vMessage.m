@@ -99,7 +99,7 @@
 
 -(id) dataObject{
     if(_dataObject == nil){
-        if((_resourceURI && [_contentType isEqualToString:@"application/x-www-form-urlencoded"]) && _body){
+        if((_resourceURI || [_contentType isEqualToString:@"application/x-www-form-urlencoded"]) && _body){
             NSString * text = [[NSString alloc] initWithData:_body encoding:NSUTF8StringEncoding];
             _dataObject = [[NSMutableDictionary alloc] initWithCapacity:4];
             NSArray * items = [text componentsSeparatedByString:@"&"];

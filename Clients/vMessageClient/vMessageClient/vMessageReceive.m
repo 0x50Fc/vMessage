@@ -46,10 +46,6 @@
 @property(retain) vMessage * message;
 @property(retain) NSRunLoop * runloop;
 
--(void) onDidMessage:(vMessage *) message;
-
--(void) onDidFailError:(NSError * ) error;
-
 
 @end
 
@@ -384,10 +380,12 @@
                                     [_inputStream close];
                                     [_outputStream close];
                                     
+                                    vMessageClient * client = [NSOperationQueue currentQueue];
+                                    
                                     dispatch_async(dispatch_get_main_queue(), ^{
                                         
                                         if(![self isCancelled] ){
-                                            [self onDidFailError:[NSError errorWithDomain:@"vMessageReceive" code:CFHTTPMessageGetResponseStatusCode(_response) userInfo:data]];
+                                            [self didFailError:[NSError errorWithDomain:@"vMessageReceive" code:CFHTTPMessageGetResponseStatusCode(_response) userInfo:data] client:client];
                                         }
                                         
                                     });
@@ -412,10 +410,12 @@
                                     [_inputStream close];
                                     [_outputStream close];
                                     
+                                    vMessageClient * client = [NSOperationQueue currentQueue];
+                                    
                                     dispatch_async(dispatch_get_main_queue(), ^{
                                         
                                         if(![self isCancelled]){
-                                            [self onDidFailError:[NSError errorWithDomain:@"vMessageReceive" code:-11 userInfo:[NSDictionary dictionaryWithObject:@"only support chunked" forKey:NSLocalizedDescriptionKey]]];
+                                            [self didFailError:[NSError errorWithDomain:@"vMessageReceive" code:-11 userInfo:[NSDictionary dictionaryWithObject:@"only support chunked" forKey:NSLocalizedDescriptionKey]] client:client];
                                         }
                                         
                                     });
@@ -614,10 +614,12 @@
                                             self.timestamp = msg.timestamp;
                                         }
                                         
+                                        vMessageClient * client = [NSOperationQueue currentQueue];
+                                        
                                         dispatch_async(dispatch_get_main_queue(), ^{
                                             self.idle = self.minIdle;
                                             if(![self isCancelled]){
-                                                [self onDidMessage:msg];
+                                                [self didRecvMessage:msg client:client];
                                             }
                                         });
                                         
@@ -735,9 +737,11 @@
             
             NSError * error = aStream.streamError;
             
+            vMessageClient * client = [NSOperationQueue currentQueue];
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 if(![self isCancelled]){
-                    [self onDidFailError:error];
+                    [self didFailError:error client:client];
                 }
             });
             
@@ -758,15 +762,16 @@
     }
 }
 
--(void) onDidMessage:(vMessage *) message{
-    if([_delegate respondsToSelector:@selector(vMessageReceive:didRecvMessage:)]){
-        [_delegate vMessageReceive:self didRecvMessage:message];
+
+-(void) didRecvMessage:(vMessage *) message client:(vMessageClient *) client{
+    if([_delegate respondsToSelector:@selector(vMessageReceive:didRecvMessage:client:)]){
+        [_delegate vMessageReceive:self didRecvMessage:message client:client];
     }
 }
 
--(void) onDidFailError:(NSError * ) error{
-    if([_delegate respondsToSelector:@selector(vMessageReceive:didFailError:)]){
-        [_delegate vMessageReceive:self didFailError:error];
+-(void) didFailError:(NSError *) error client:(vMessageClient *) client{
+    if([_delegate respondsToSelector:@selector(vMessageReceive:didFailError:client:)]){
+        [_delegate vMessageReceive:self didFailError:error client:client];
     }
 }
 

@@ -61,7 +61,7 @@
     return self;
 }
 
--(BOOL) willRequest:(CFHTTPMessageRef)request{
+-(BOOL) willRequest:(CFHTTPMessageRef)request client:(vMessageClient *)client{
     
     CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef) @"Content-Type"
                                      , (CFStringRef) _contentType);
@@ -76,7 +76,7 @@
     return YES;
 }
 
--(BOOL) didHasSpaceStream:(NSOutputStream *) stream{
+-(BOOL) didHasSpaceStream:(NSOutputStream *) stream client:(vMessageClient *)client{
     
     char buf[SBUF_ITEM_SIZE];
     int len,llen;
@@ -96,8 +96,13 @@
                     
                     if( len != [stream write: (uint8_t *) buf maxLength:len]){
                         
-                        [self didFailError:[stream streamError]];
+                        NSError * error = [stream streamError];
                         
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [self didFailError:error client:client];
+                        });
+                        
+                                                
                         return NO;
                     }
                     
@@ -136,8 +141,12 @@
        
         if( len != [stream write: (uint8_t *) buf maxLength:len]){
             
-            [self didFailError:[stream streamError]];
+            NSError * error = [stream streamError];
             
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self didFailError:error client:client];
+            });
+           
             return NO;
         }
 

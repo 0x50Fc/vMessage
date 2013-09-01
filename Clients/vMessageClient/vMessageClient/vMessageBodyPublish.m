@@ -92,7 +92,7 @@
     return self;
 }
 
--(BOOL) willRequest:(CFHTTPMessageRef)request{
+-(BOOL) willRequest:(CFHTTPMessageRef)request client:(vMessageClient *)client{
     
     CFHTTPMessageSetHeaderFieldValue(request, (CFStringRef) @"Content-Type"
                                      , (CFStringRef) @"application/x-www-form-urlencoded");
@@ -107,7 +107,7 @@
     return YES;
 }
 
--(BOOL) didHasSpaceStream:(NSOutputStream *)stream{
+-(BOOL) didHasSpaceStream:(NSOutputStream *)stream client:(vMessageClient *)client{
     return NO;
 }
 

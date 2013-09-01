@@ -91,25 +91,25 @@
     return self;
 }
 
--(BOOL) willRequest:(CFHTTPMessageRef) request{
+-(BOOL) willRequest:(CFHTTPMessageRef) request client:(vMessageClient *) client{
     return NO;
 }
 
--(BOOL) didHasSpaceStream:(NSOutputStream *) stream{
+-(BOOL) didHasSpaceStream:(NSOutputStream *) stream client:(vMessageClient *) client{
  
     return NO;
 }
 
--(void) didFinishResponse:(CFHTTPMessageRef) response{
-    if([_delegate respondsToSelector:@selector(vMessagePublish:didFinishResponse:)]){
-        [_delegate vMessagePublish:self didFinishResponse:response];
+-(void) didFinishResponse:(CFHTTPMessageRef) response client:(vMessageClient *) client{
+    if([_delegate respondsToSelector:@selector(vMessagePublish:didFinishResponse:client:)]){
+        [_delegate vMessagePublish:self didFinishResponse:response client:client];
     }
     _finished = YES;
 }
 
--(void) didFailError:(NSError *) error{
-    if([_delegate respondsToSelector:@selector(vMessagePublish:didFailError:)]){
-        [_delegate vMessagePublish:self didFailError:error];
+-(void) didFailError:(NSError *) error client:(vMessageClient *) client{
+    if([_delegate respondsToSelector:@selector(vMessagePublish:didFailError:client:)]){
+        [_delegate vMessagePublish:self didFailError:error client:client];
     }
     _finished = YES;
 }
@@ -148,8 +148,12 @@
             
         }
         
-        if(! [self willRequest:_request]){
+        if(! [self willRequest:_request client:client]){
             _executing = NO;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self didFailError:[NSError errorWithDomain:@"vMessagePublish" code:0 userInfo:[NSDictionary dictionaryWithObject:@"will request return no" forKey:NSLocalizedDescriptionKey]] client:client];
+            });
+            
             return;
         }
         
@@ -331,9 +335,11 @@
                                     [_outputStream close];
                                     [_inputStream close];
                                     
+                                    vMessageClient * client = [NSOperationQueue currentQueue];
+                                    
                                     dispatch_async(dispatch_get_main_queue(), ^{
                                         if(!_finished){
-                                            [self didFinishResponse:_response];
+                                            [self didFinishResponse:_response client:client];
                                         }
                                     });
                                     
@@ -411,9 +417,11 @@
                             
                             NSError * error = aStream.streamError;
                             
+                            vMessageClient * client = [NSOperationQueue currentQueue];
+                            
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 if(! _finished){
-                                    [self didFailError:error];
+                                    [self didFailError:error client:client];
                                 }
                             });
                         }
@@ -431,7 +439,7 @@
                     }
                     else if(_outputState.state == 1){
                         
-                        if(![self didHasSpaceStream:_outputStream]){
+                        if(![self didHasSpaceStream:_outputStream client:[NSOperationQueue currentQueue]]){
                             _outputState.state = 2;
                             
                             break;
@@ -462,9 +470,11 @@
             
             NSError * error = aStream.streamError;
             
+            vMessageClient * client = [NSOperationQueue currentQueue];
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 if(! _finished){
-                    [self didFailError:error];
+                    [self didFailError:error client:client];
                 }
             });
         }

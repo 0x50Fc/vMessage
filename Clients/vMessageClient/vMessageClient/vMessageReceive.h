@@ -24,6 +24,10 @@
 @property(nonatomic,assign) NSTimeInterval maxIdle;
 @property(nonatomic,assign) NSTimeInterval addIdle;
 
+-(void) didRecvMessage:(vMessage *) message client:(vMessageClient *) client;
+
+-(void) didFailError:(NSError *) error client:(vMessageClient *) client;
+
 @end
 
 
@@ -31,8 +35,8 @@
 
 @optional
 
--(void) vMessageReceive:(vMessageReceive *) receive didRecvMessage:(vMessage *) message;
+-(void) vMessageReceive:(vMessageReceive *) receive didRecvMessage:(vMessage *) message client:(vMessageClient *) client;
 
--(void) vMessageReceive:(vMessageReceive *) receive didFailError:(NSError *) error;
+-(void) vMessageReceive:(vMessageReceive *) receive didFailError:(NSError *) error client:(vMessageClient *) client;
 
 @end
