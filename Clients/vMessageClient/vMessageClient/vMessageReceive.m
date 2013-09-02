@@ -770,9 +770,12 @@
 }
 
 -(void) didFailError:(NSError *) error client:(vMessageClient *) client{
+    
     if([_delegate respondsToSelector:@selector(vMessageReceive:didFailError:client:)]){
         [_delegate vMessageReceive:self didFailError:error client:client];
     }
+    
+    _finished = YES;
 }
 
 @end

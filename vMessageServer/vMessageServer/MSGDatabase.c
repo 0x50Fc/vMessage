@@ -394,7 +394,7 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
             
             sprintf(uuid,"%lx%x.r",tv.tv_sec,tv.tv_usec);
             
-            snprintf(path, sizeof(path),"%s/%s/res/%s",dir,auth->user,uuid);
+            snprintf(path, sizeof(path),"%s/%s/res/%s",dir,auth->to,uuid);
             
             if(stat(path, &s) == -1){
                 break;
