@@ -167,7 +167,7 @@
     }
     
     _finished = YES;
-    if([_delegate respondsToSelector:@selector(vMessageResourceDidFinished:)]){
+    if([_delegate respondsToSelector:@selector(vMessageResourceDidFinished:client:)]){
         [_delegate vMessageResourceDidFinished:self client:client];
     }
 }
