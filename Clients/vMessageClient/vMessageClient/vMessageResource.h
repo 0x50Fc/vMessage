@@ -18,13 +18,13 @@
 
 -(id) initWithUri:(NSString *) uri filePath:(NSString *) filePath;
 
--(void) didResponse:(CFHTTPMessageRef) response;
+-(void) didResponse:(CFHTTPMessageRef) response client:(vMessageClient *) client;
 
--(void) didRecvBytes:(NSUInteger ) bytes contentLength:(NSUInteger) contentLength;
+-(void) didRecvBytes:(NSUInteger ) bytes contentLength:(NSUInteger) contentLength client:(vMessageClient *) client;
 
--(void) didFailError:(NSError *) error;
+-(void) didFailError:(NSError *) error client:(vMessageClient *) client;
 
--(void) didFinished;
+-(void) didFinished:(vMessageClient *) client;
 
 @end
 
@@ -32,12 +32,12 @@
 
 @optional
 
--(void) vMessageResource:(vMessageResource *) resource didResponse:(CFHTTPMessageRef) response;
+-(void) vMessageResource:(vMessageResource *) resource didResponse:(CFHTTPMessageRef) response client:(vMessageClient *) client;
 
--(void) vMessageResource:(vMessageResource *) resource didRecvBytes:(NSUInteger) bytes contentLength:(NSUInteger) contentLength;
+-(void) vMessageResource:(vMessageResource *) resource didRecvBytes:(NSUInteger) bytes contentLength:(NSUInteger) contentLength client:(vMessageClient *) client;
 
--(void) vMessageResource:(vMessageResource *) resource didFailError:(NSError *) error;
+-(void) vMessageResource:(vMessageResource *) resource didFailError:(NSError *) error client:(vMessageClient *) client;
 
--(void) vMessageResourceDidFinished:(vMessageResource *) resource;
+-(void) vMessageResourceDidFinished:(vMessageResource *) resource client:(vMessageClient *) client;
 
 @end

@@ -119,19 +119,19 @@
     return _executing;
 }
 
--(void) didResponse:(CFHTTPMessageRef) response{
-    if([_delegate respondsToSelector:@selector(vMessageResource:didResponse:)]){
-        [_delegate vMessageResource:self didResponse:response];
+-(void) didResponse:(CFHTTPMessageRef) response client:(vMessageClient *) client{
+    if([_delegate respondsToSelector:@selector(vMessageResource:didResponse:client:)]){
+        [_delegate vMessageResource:self didResponse:response client:client];
     }
 }
 
--(void) didRecvBytes:(NSUInteger ) bytes contentLength:(NSUInteger) contentLength{
-    if([_delegate respondsToSelector:@selector(vMessageResource:didRecvBytes:contentLength:)]){
-        [_delegate vMessageResource:self didRecvBytes:bytes contentLength:contentLength];
+-(void) didRecvBytes:(NSUInteger ) bytes contentLength:(NSUInteger) contentLength client:(vMessageClient *) client{
+    if([_delegate respondsToSelector:@selector(vMessageResource:didRecvBytes:contentLength:client:)]){
+        [_delegate vMessageResource:self didRecvBytes:bytes contentLength:contentLength client:client];
     }
 }
 
--(void) didFailError:(NSError *) error{
+-(void) didFailError:(NSError *) error client:(vMessageClient *) client{
     
     if(_file){
         fclose(_file);
@@ -139,12 +139,12 @@
     }
     
     _finished = YES;
-    if([_delegate respondsToSelector:@selector(vMessageResource:didFailError:)]){
-        [_delegate vMessageResource:self didFailError:error];
+    if([_delegate respondsToSelector:@selector(vMessageResource:didFailError:client:)]){
+        [_delegate vMessageResource:self didFailError:error client:client];
     }
 }
 
--(void) didFinished{
+-(void) didFinished:(vMessageClient *) client{
     
     if(_file){
         fclose(_file);
@@ -168,7 +168,7 @@
     
     _finished = YES;
     if([_delegate respondsToSelector:@selector(vMessageResourceDidFinished:)]){
-        [_delegate vMessageResourceDidFinished:self];
+        [_delegate vMessageResourceDidFinished:self client:client];
     }
 }
 
@@ -195,7 +195,7 @@
                 
                 snprintf(etag, sizeof(etag),"W/%lx",s.st_mtimespec.tv_sec);
                 
-                CFHTTPMessageSetHeaderFieldValue(_response, (CFStringRef) @"If-None-Match"
+                CFHTTPMessageSetHeaderFieldValue(_request, (CFStringRef) @"If-None-Match"
                                                  , (CFStringRef) [NSString stringWithCString:etag encoding:NSUTF8StringEncoding]);
                 
                 _file = fopen([_filePath UTF8String], "ab");
@@ -366,9 +366,11 @@
                                         [_inputStream close];
                                         [_outputStream close];
                                         
+                                        vMessageClient * client = [NSOperationQueue currentQueue];
+                                        
                                         dispatch_async(dispatch_get_main_queue(), ^{
                                             if(! _finished){
-                                                [self didFinished];
+                                                [self didFinished:client];
                                             }
                                         });
                                         
@@ -387,9 +389,11 @@
                                         NSError * error = [NSError errorWithDomain:NSStringFromClass([self class])
                                                                               code:CFHTTPMessageGetResponseStatusCode(_response) userInfo:nil];
                                         
+                                        vMessageClient * client = [NSOperationQueue currentQueue];
+                                        
                                         dispatch_async(dispatch_get_main_queue(), ^{
                                             if(! _finished){
-                                                [self didFailError:error];
+                                                [self didFailError:error client:client];
                                             }
                                         });
 
@@ -421,9 +425,11 @@
                                     _inputState.key = 0;
                                     _inputState.value = 0;
                                     
+                                    vMessageClient * client = [NSOperationQueue currentQueue];
+                                    
                                     dispatch_async(dispatch_get_main_queue(), ^{
                                         if(!_finished){
-                                            [self didResponse:_response];
+                                            [self didResponse:_response client:client];
                                         }
                                     });
                                     
@@ -447,9 +453,11 @@
                                         [_inputStream close];
                                         [_outputStream close];
                                         
+                                        vMessageClient * client = [NSOperationQueue currentQueue];
+                                        
                                         dispatch_async(dispatch_get_main_queue(), ^{
                                             if(! _finished){
-                                                [self didFinished];
+                                                [self didFinished:client];
                                             }
                                         });
                                         
@@ -513,9 +521,11 @@
                                     [_inputStream close];
                                     [_outputStream close];
                                     
+                                    vMessageClient * client = [NSOperationQueue currentQueue];
+                                    
                                     dispatch_async(dispatch_get_main_queue(), ^{
                                         if(! _finished){
-                                            [self didFinished];
+                                            [self didFinished:client];
                                         }
                                     });
                                     
@@ -560,9 +570,11 @@
                             
                             NSError * error = aStream.streamError;
                             
+                            vMessageClient * client = [NSOperationQueue currentQueue];
+                            
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 if(! _finished){
-                                    [self didFailError:error];
+                                    [self didFailError:error client:client];
                                 }
                             });
                             return;
@@ -604,9 +616,11 @@
             
             NSError * error = aStream.streamError;
             
+            vMessageClient * client = [NSOperationQueue currentQueue];
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 if(! _finished){
-                    [self didFailError:error];
+                    [self didFailError:error client:client];
                 }
             });
         }

@@ -377,7 +377,7 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
     }
     else{
         
-        snprintf(path, sizeof(path),"%s/%s/res",dir,auth->user);
+        snprintf(path, sizeof(path),"%s/%s/res",dir,auth->to);
         
         if(stat(path, &s) == -1){
             mkdir(path,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
