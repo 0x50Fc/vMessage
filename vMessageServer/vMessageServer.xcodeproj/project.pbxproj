@@ -210,6 +210,7 @@
 		1140D717177AB9FD009B7F82 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 		1140D71A177ABEB5009B7F82 /* sina.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = sina.py; sourceTree = "<group>"; };
 		1140D71C177AC2A1009B7F82 /* sina.xsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sina.xsl; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xml; };
+		117A6DCE17D72FAF007BA203 /* MSG_CGI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSG_CGI.h; sourceTree = "<group>"; };
 		AC11CDED177F0B140001BFF2 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -252,6 +253,7 @@
 				11237EB8177317CF002D95F0 /* C */,
 				11237EAF177317A0002D95F0 /* main.c */,
 				11237EB1177317A0002D95F0 /* vMessageServer.1 */,
+				117A6DCE17D72FAF007BA203 /* MSG_CGI.h */,
 				11237F561773EF4B002D95F0 /* MSGServerProcess.h */,
 				11237F571773EF58002D95F0 /* MSGServerProcess.c */,
 				11237F691773F5BD002D95F0 /* MSG.h */,

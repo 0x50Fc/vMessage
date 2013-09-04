@@ -12,6 +12,7 @@
 #include "MSG.h"
 #include "MSGAuth.h"
 #include "MSGDatabase.h"
+#include "MSG_CGI.h"
 
 #define MSGServerProcessClientMaxCount     1024
 #define MSGServerProcessClientMaxThread    128
@@ -112,6 +113,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
             
             if(request.state.state == MSGHttpRequestStateOK){
 
+                
                 if(MSGStringEqual(&sbuf,request.method,"POST")){
                     
                     auth = (* MSGServerProcess.authClass->create)(MSGServerProcess.authClass,& request,& sbuf);
@@ -800,7 +802,7 @@ static int MSGServerProcessCreate (SRVServer * server,SRVProcess * process){
 }
 
 static void MSGServerProcessExit (SRVServer * server,SRVProcess * process){
-    printf("MSGServerProcessExit %d %d\n",process->pid,errno);
+    SRVServerLog("MSGServerProcessExit %d %d\n",process->pid,errno);
 }
 
 static void MSGServerProcessOpen (SRVServer * server,SRVProcess * process){
@@ -830,6 +832,7 @@ static double MSGServerProcessTick (SRVServer * server,SRVProcess * process){
         socklen = sizeof(struct sockaddr_in );
         client = SRVServerAccept(server,0.002,(struct sockaddr *)&addr,& socklen);
         if(client){
+            SRVServerLog("\n[%d]Accept %s:%d\n",client,inet_ntoa(addr.sin_addr),ntohs(addr.sin_port));
             MSGServerProcess.clients[MSGServerProcess.endIndex] = client;
             MSGServerProcess.endIndex = (MSGServerProcess.endIndex + 1) % MSGServerProcessClientMaxCount;
             MSGServerProcess.sleep_v = 0.0;

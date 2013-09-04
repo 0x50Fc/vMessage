@@ -47,6 +47,8 @@ static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth
     
     int fno;
     
+    SRVServerLog("\nMSGDatabaseDefaultWrite\n");
+
     assert(dir);
     
     MSGBufferExpandSize(dbuf, size );
@@ -105,6 +107,10 @@ static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth
         rs = MSGDatabaseResultWriteError;
     }
     
+    (* auth->clazz->didWritedEntity)(auth,entity);
+    
+    SRVServerLog("\nMSGDatabaseDefaultWrite OK\n");
+    
     return MSGDatabaseResultOK;
 }
 
@@ -126,8 +132,10 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
     MSGDatabaseEntity entity;
     MSGDatabaseIndex index;
     
-    assert(dir);
+    SRVServerLog("\nMSGDatabaseDefaultCursorOpen\n");
     
+    assert(dir);
+
     snprintf(path, sizeof(path),"%s/%s/db/w.db",dir,auth->user);
     
     dbfno = open(path, O_RDONLY);
@@ -286,6 +294,9 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
             
         }
     }
+    
+    SRVServerLog("\nMSGDatabaseDefaultCursorOpen OK\n");
+    
     return (MSGDatabaseCursor *)cursor;
 }
 
@@ -357,6 +368,8 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
     struct stat s;
     int fno = -1;
     
+    SRVServerLog("\nMSGDatabaseDefaultOpenResource\n");
+    
     if(uri){
         
         sscanf(uri, "/r/%s",uuid);
@@ -421,6 +434,8 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
     
     snprintf(res->uri, sizeof(res->uri),"/r/%s",uuid);
     res->fno = fno;
+    
+    SRVServerLog("\nMSGDatabaseDefaultOpenResource OK\n");
     
     return hbool_true;
 }
