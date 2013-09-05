@@ -33,6 +33,7 @@ static void SRVServerLogMSG(struct _SRVServer * srv,const char * format,va_list 
     }
     
     if(fno != -1){
+        
         len = vsnprintf(sbuf, sizeof(sbuf), format, va);
         
         write(fno, sbuf, len);

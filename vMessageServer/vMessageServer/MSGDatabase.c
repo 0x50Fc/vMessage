@@ -9,6 +9,8 @@
 #include "hconfig.h"
 #include "MSGDatabase.h"
 
+#include "hserver.h"
+
 
 MSGDatabaseResult MSGDatabaseResultOK = {200,"OK"};
 

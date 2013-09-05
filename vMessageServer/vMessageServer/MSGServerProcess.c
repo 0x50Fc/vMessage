@@ -79,6 +79,8 @@ static void * MSGServerProcessThreadRun(void * userInfo){
             auth = NULL;
             database = NULL;
             
+            SRVServerLog("\n[%d]REQUEST BEGIN\n",thread->client);
+            
             while(state == StreamStateOK){
                 
                 if(request.state.state == MSGHttpRequestStateFail){
@@ -112,10 +114,12 @@ static void * MSGServerProcessThreadRun(void * userInfo){
             }
             
             if(request.state.state == MSGHttpRequestStateOK){
-
+                
+                SRVServerLog("\n%s\n",sbuf.data);
                 
                 if(MSGStringEqual(&sbuf,request.method,"POST")){
                     
+
                     auth = (* MSGServerProcess.authClass->create)(MSGServerProcess.authClass,& request,& sbuf);
                     
                     if(auth){
@@ -456,7 +460,7 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                     
                 }
                 else if(MSGStringEqual(&sbuf, request.method, "GET")){
-                    
+      
                     auth = (* MSGServerProcess.authClass->create)(MSGServerProcess.authClass,& request,& sbuf);
                     
                     if(auth){
@@ -740,8 +744,11 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                 }
                 
             }
-            
+
             stream_socket_close(thread->client);
+            
+            SRVServerLog("\n[%d]REQUEST END\n",thread->client);
+            
             thread->client = 0;
             idle = 0;
             sleep_v = 0;
@@ -831,7 +838,7 @@ static double MSGServerProcessTick (SRVServer * server,SRVProcess * process){
     if(length < MSGServerProcessClientMaxCount){
         socklen = sizeof(struct sockaddr_in );
         client = SRVServerAccept(server,0.002,(struct sockaddr *)&addr,& socklen);
-        if(client){
+        if(client > 0){
             SRVServerLog("\n[%d]Accept %s:%d\n",client,inet_ntoa(addr.sin_addr),ntohs(addr.sin_port));
             MSGServerProcess.clients[MSGServerProcess.endIndex] = client;
             MSGServerProcess.endIndex = (MSGServerProcess.endIndex + 1) % MSGServerProcessClientMaxCount;
