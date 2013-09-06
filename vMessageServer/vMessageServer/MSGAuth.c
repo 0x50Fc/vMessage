@@ -174,7 +174,7 @@ static void MSGAuthDefaultDidWritedEntity (MSGAuth * auth,struct _MSGDatabaseEnt
             sprintf(sbuf, "%f",e.timestamp);
             setenv(MSG_ENV_ENTITY_TIMESTAMP, sbuf, 1);
             
-            execl(a.didWritedEntityExec, NULL);
+            system(a.didWritedEntityExec);
             
             exit(EXIT_SUCCESS);
         }
