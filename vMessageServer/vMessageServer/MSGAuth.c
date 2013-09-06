@@ -155,6 +155,8 @@ static void MSGAuthDefaultDidWritedEntity (MSGAuth * auth,struct _MSGDatabaseEnt
         memcpy(&a,auth, sizeof(MSGAuth));
         memcpy(&e,entity, sizeof(MSGDatabaseEntity));
         
+        SRVServerLog("\nMSGAuthDefaultDidWritedEntity\n");
+        SRVServerLog("\n%s\n",a.didWritedEntityExec);
         
         if(( pid = fork() ) < 0 )
         {
