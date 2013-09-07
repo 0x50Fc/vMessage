@@ -150,7 +150,7 @@
     NSString * host = [url host];
     
     NSUInteger port = [[url port] unsignedIntValue];
-    
+
     if(port == 0){
         port = 80;
     }
@@ -183,8 +183,9 @@
                                        , (CFReadStreamRef *)&_inputStream
                                        , (CFWriteStreamRef *)&_outputStream);
     
-    
+    [_inputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType];
     [_inputStream setDelegate:self];
+    [_outputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType];
     [_outputStream setDelegate:self];
     
     [_inputStream scheduleInRunLoop:_runloop forMode:NSRunLoopCommonModes];
