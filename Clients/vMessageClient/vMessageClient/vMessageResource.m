@@ -136,6 +136,7 @@
     if(_file){
         fclose(_file);
         _file = NULL;
+        [[NSFileManager defaultManager] removeItemAtPath:[_filePath stringByAppendingPathExtension:@"t"] error:nil];
     }
     
     _finished = YES;
@@ -149,6 +150,7 @@
     if(_file){
         fclose(_file);
         _file = NULL;
+        [[NSFileManager defaultManager] moveItemAtPath:[_filePath stringByAppendingPathExtension:@"t"] toPath:_filePath error:nil];
     }
     
     CFStringRef c = CFHTTPMessageCopyHeaderFieldValue(_response, (CFStringRef) @"ETag");
@@ -197,13 +199,9 @@
                 
                 CFHTTPMessageSetHeaderFieldValue(_request, (CFStringRef) @"If-None-Match"
                                                  , (CFStringRef) [NSString stringWithCString:etag encoding:NSUTF8StringEncoding]);
-                
-                _file = fopen([_filePath UTF8String], "ab");
-            }
-            else{
-                _file = fopen([_filePath UTF8String], "wb");
             }
             
+            _file = fopen([[_filePath stringByAppendingPathExtension:@"t"] UTF8String], "wb");
         }
         
         NSURL * url = client.url;
