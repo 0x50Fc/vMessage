@@ -169,8 +169,10 @@
                                            , (CFReadStreamRef *) & _inputStream, (CFWriteStreamRef *)& _outputStream);
         
         
+        [_inputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType];
         [_inputStream setDelegate:self];
         [_inputStream scheduleInRunLoop:_runloop forMode:NSRunLoopCommonModes];
+        [_outputStream setProperty:NSStreamNetworkServiceTypeVoIP forKey:NSStreamNetworkServiceType];
         [_outputStream setDelegate:self];
         [_outputStream scheduleInRunLoop:_runloop forMode:NSRunLoopCommonModes];
         
