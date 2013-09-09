@@ -16,7 +16,7 @@
 
 @property(nonatomic,readonly) NSURL * url;
 @property(nonatomic,readonly) NSString * user;
-@property(nonatomic,readonly) NSString * password;
+@property(nonatomic,retain) NSString * password;
 
 -(id) initWithURL:(NSURL *) url user:(NSString *) user password:(NSString *) password;
 
