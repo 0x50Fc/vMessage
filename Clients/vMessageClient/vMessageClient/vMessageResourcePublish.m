@@ -9,7 +9,6 @@
 #import "vMessageResourcePublish.h"
 
 #define SBUF_SIZE   4096
-#define SBUF_ITEM_SIZE   5000
 
 @interface vMessageResourcePublish(){
 
@@ -78,76 +77,73 @@
 
 -(BOOL) didHasSpaceStream:(NSOutputStream *) stream client:(vMessageClient *)client{
     
-    char buf[SBUF_ITEM_SIZE];
-    int len,llen;
+    int len;
+    char slen[8];
     
     while ([stream hasSpaceAvailable]) {
         
-        while(sbuf.length == 0){
+        if(sbuf.length == 0){
             
-            sbuf.length = read(_fno, sbuf.data, sizeof(sbuf.data));
             sbuf.index = 0;
             
-            if(sbuf.length == 0){
+            len = read(_fno, sbuf.data + 6, sizeof(sbuf.data) - 8);
+            
+            if(len < 0){
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self didFailError:[NSError errorWithDomain:NSStringFromClass([self class]) code:0 userInfo:[NSDictionary dictionaryWithObject:@"read file error" forKey:NSLocalizedDescriptionKey]] client:client];
+                });
+                
+                return NO;
+            }
+            else if(len ==0){
                 
                 if(_fileEOF){
                     
-                    len = sprintf(buf,"0\r\n\r\n");
+                    len = snprintf(slen, sizeof(slen),"0\r\n\r\n");
                     
-                    if( len != [stream write: (uint8_t *) buf maxLength:len]){
+                    if( len != [stream write: (uint8_t *) slen maxLength:len]){
                         
                         NSError * error = [stream streamError];
                         
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [self didFailError:error client:client];
                         });
-                        
-                                                
+
                         return NO;
                     }
                     
                     return NO;
                 }
                 
-                usleep(600);
+                return YES;
             }
-            
-        }
-        
-        len = sprintf(buf,"%x\r\n",sbuf.length);
-    
-        NSLog(@"%u B",sbuf.length);
-        
-        llen = sizeof(buf) - len - 4;
-        
-        if(sbuf.length <= llen){
-            memcpy(buf + len, sbuf.data + sbuf.index, sbuf.length);
-            len += sbuf.length;
-            
-            sbuf.index +=  sbuf.length;
-            sbuf.length = 0;
+            else {
+                sbuf.length = len + 8;
+                snprintf(slen, sizeof(slen),"%04x\r\n",len);
+                memcpy(sbuf.data, slen, 6);
+                strcpy(slen, "\r\n");
+                memcpy(sbuf.data + 6 + len, slen, 2);
+            }
         }
         else{
             
-            memcpy(buf + len, sbuf.data + sbuf.index, llen);
+            len = [stream write:sbuf.data + sbuf.index maxLength:sbuf.length];
             
-            sbuf.index += llen;
-            sbuf.length -= llen;
-            
-            len += llen;
-        }
-        
-        len += sprintf(buf + len, "\r\n");
-       
-        if( len != [stream write: (uint8_t *) buf maxLength:len]){
-            
-            NSError * error = [stream streamError];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self didFailError:error client:client];
-            });
-           
-            return NO;
+            if(len >0){
+                sbuf.index += len;
+                sbuf.length -= len;
+            }
+            else{
+                
+                NSError * error = [stream streamError];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self didFailError:error client:client];
+                });
+                
+                return NO;
+            }
         }
 
     }
