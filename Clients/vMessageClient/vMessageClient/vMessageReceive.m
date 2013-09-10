@@ -233,15 +233,23 @@
                     
                     uint8_t * pByte ;
                     
-                    while(_inputState.length){
+                    while(YES){
                         
-                        pByte = _inputData + _inputState.index;
+                        if(_inputState.length == 0){
+                            pByte = 0;
+                        }
+                        else{
+                            pByte = _inputData + _inputState.index;
+                        }
                         
                         switch (_inputState.state) {
                             case 0:
                             {
                                 // HTTP
-                                if(*pByte == '/'){
+                                if(pByte == 0){
+                                    
+                                }
+                                else if(*pByte == '/'){
                                     *pByte = 0;
                                     _inputState.state =1;
                                     _inputState.version = 0;
@@ -254,7 +262,10 @@
                             case 1:
                             {
                                 // HTTP/1.1
-                                if(*pByte == ' '){
+                                if(pByte == 0){
+                                    
+                                }
+                                else if(*pByte == ' '){
                                     *pByte = 0;
                                     _inputState.statusCode = 0;
                                     _inputState.state = 2;
@@ -267,7 +278,10 @@
                             case 2:
                             {
                                 // HTTP/1.1 200
-                                if(*pByte == ' '){
+                                if(pByte == 0){
+                                    
+                                }
+                                else if(*pByte == ' '){
                                     *pByte = 0;
                                     _inputState.state = 3;
                                     _inputState.status = 0;
@@ -280,7 +294,10 @@
                             case 3 :
                             {
                                 // HTTP/1.1 200 OK
-                                if( * pByte == '\r'){
+                                if(pByte == 0){
+                                    
+                                }
+                                else if( * pByte == '\r'){
                                     * pByte = 0;
                                 }
                                 else if( * pByte == '\n'){
@@ -311,7 +328,12 @@
                             case 4:
                             {
                                 // key
-                                if(*pByte == ':'){
+                                if(pByte == 0 || *pByte == '\n'){
+                                    _inputState.state = 6;
+                                    _inputState.key = 0;
+                                    _inputState.value = 0;
+                                }
+                                else if(*pByte == ':'){
                                     *pByte = 0;
                                     
                                     _inputState.state = 5;
@@ -319,11 +341,6 @@
                                 }
                                 else if(*pByte == '\r'){
                                     
-                                }
-                                else if(*pByte == '\n'){
-                                    _inputState.state = 6;
-                                    _inputState.key = 0;
-                                    _inputState.value = 0;
                                 }
                                 else if(_inputState.key == 0){
                                     _inputState.key = (char *) pByte;
@@ -333,7 +350,10 @@
                             case 5:
                             {
                                 // value
-                                if(*pByte == '\r'){
+                                if(pByte == 0){
+                                    
+                                }
+                                else if(*pByte == '\r'){
                                     
                                     *pByte = 0;
                                 }
@@ -437,13 +457,18 @@
                                     _inputState.key = 0;
                                     _inputState.chunkedLength = 0;
                                 }
-                                continue;
+                                
+                                if(pByte != 0){
+                                    continue;
+                                }
                             }
                                 break;
                             case 7:
                             {
                                 // chunked
-                                if(* pByte == '\r'){
+                                if(pByte == 0){
+                                }
+                                else if(* pByte == '\r'){
                                     *pByte = 0;
                                 }
                                 else if( *pByte == '\n'){
@@ -487,7 +512,9 @@
                             {
                                 // chunked
                                 // key
-                                if(* pByte == ':'){
+                                if(pByte == 0){
+                                }
+                                else if(* pByte == ':'){
                                     * pByte = 0;
                                     _inputState.state = 9;
                                     _inputState.value = 0;
@@ -508,7 +535,9 @@
                             case 9:
                             {
                                 // chunked value
-                                if(* pByte == '\r'){
+                                if(pByte == 0){
+                                }
+                                else if(* pByte == '\r'){
                                     * pByte = 0;
                                 }
                                 else if(* pByte == '\n'){
@@ -568,7 +597,9 @@
                             case 10:
                             {
                                 // chunked body
-                                if(_inputState.contentLength){
+                                if(pByte == 0){
+                                }
+                                else if(_inputState.contentLength){
                                     
                                     if(_message.body == nil){
                                         _message.body = [NSMutableData dataWithCapacity:_inputState.contentLength];
@@ -631,7 +662,9 @@
                                 break;
                             case 11:
                             {
-                                if( *pByte == '\r'){
+                                if(pByte == 0){
+                                }
+                                else if( *pByte == '\r'){
                                     
                                 }
                                 else if( *pByte == '\n'){
@@ -660,6 +693,10 @@
                                 break;
                             default:
                                 break;
+                        }
+                        
+                        if(_inputState.length == 0){
+                            break;
                         }
                         
                         _inputState.index ++;
