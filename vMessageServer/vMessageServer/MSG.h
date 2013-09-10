@@ -30,6 +30,8 @@ extern "C" {
     
     hbool MSGStringEqual(MSGBuffer * buf,MSGString string,hcchar * cString);
     hbool MSGStringHasPrefix(MSGBuffer * buf,MSGString string,hcchar * cString);
+
+    hbool MSGBlockHasUser(hcchar * block,hcchar * user);
     
     extern MSGString MSGStringZero;
     

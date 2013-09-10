@@ -591,71 +591,84 @@ static void * MSGServerProcessThreadRun(void * userInfo){
                             }
                             else{
                             
-                                MSGDatabaseCursor * cursor = ( * MSGServerProcess.databaseClass->cursorOpen)(database,auth,&request,&sbuf);
-                                MSGDatabaseEntity * entity;
-        
-                                state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
-                                
-                                if(state == StreamStateOK){
+                                {
+                                    MSGDatabaseCursor * cursor = ( * MSGServerProcess.databaseClass->cursorOpen)(database,auth,&request,&sbuf);
+                                    MSGDatabaseEntity * entity;
+                                    hchar block[1024] = {0};
                                     
-                                    if(* auth->cookie != 0){
-                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nSet-Cookie: %s\r\nTransfer-Encoding: chunked\r\nAccess-Control-Allow-Origin: %s\r\nTimestamp: %f\r\nAccess-Control-Expose-Headers: %s\r\n\r\n"
-                                                               ,auth->cookie,MSGAllowOrigin,cursor ? cursor->timestamp : 0 ,MSGAllowResponseHeaders);
-                                    }
-                                    else{
-                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nAccess-Control-Allow-Origin: %s\r\nTimestamp: %f\r\nAccess-Control-Expose-Headers: %s\r\n\r\n"
-                                                               ,MSGAllowOrigin,cursor ? cursor->timestamp : 0,MSGAllowResponseHeaders);
+                                    h = MSGHttpRequestGetHeader(&request, &sbuf, "Block");
+                                    
+                                    if(h){
+                                        memcpy(block, sbuf.data + h->value.location, MIN(sizeof(block) -1, h->value.length));
                                     }
                                     
-                                    stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                                    state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
                                     
-                                }
-                                
-                                if(cursor){
-                                
-                                    while ((entity = ( * MSGServerProcess.databaseClass->cursorNext)(database,cursor,&dbuf))) {
+                                    if(state == StreamStateOK){
                                         
-            
-                                        sbuf.length = snprintf(sbuf.data, sbuf.size,"Content-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\nFrom: %s\r\nResource-URI:%s\r\n\r\n"
-                                                               ,entity->type,entity->length,entity->timestamp,entity->user,entity->uri);
-                                        
-                                        sbuf.length = snprintf(sbuf.data, sbuf.size, "%x\r\nContent-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\nFrom: %s\r\nResource-URI:%s\r\n\r\n"
-                                                               ,sbuf.length + entity->length + 2, entity->type,entity->length,entity->timestamp,entity->user,entity->uri);
-                                        
-                                        MSGBufferExpandSize(&sbuf, sbuf.length + entity->length + 8);
-                                        
-                                        if(entity->length){
-                                            memcpy(sbuf.data + sbuf.length, (hchar *)entity + sizeof(MSGDatabaseEntity), entity->length);
-                                            sbuf.length += entity->length;
-                                        }
-                                        
-                                        memcpy(sbuf.data + sbuf.length, "\r\n\r\n", 4);
-                                        
-                                        sbuf.length += 4;
-                                        
-                                        state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
-                                        
-                                        if(state == StreamStateOK){
-                                            stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                                        if(* auth->cookie != 0){
+                                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nSet-Cookie: %s\r\nTransfer-Encoding: chunked\r\nAccess-Control-Allow-Origin: %s\r\nTimestamp: %f\r\nAccess-Control-Expose-Headers: %s\r\n\r\n"
+                                                                   ,auth->cookie,MSGAllowOrigin,cursor ? cursor->timestamp : 0 ,MSGAllowResponseHeaders);
                                         }
                                         else{
-                                            break;
+                                            sbuf.length = snprintf(sbuf.data, sbuf.size,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nAccess-Control-Allow-Origin: %s\r\nTimestamp: %f\r\nAccess-Control-Expose-Headers: %s\r\n\r\n"
+                                                                   ,MSGAllowOrigin,cursor ? cursor->timestamp : 0,MSGAllowResponseHeaders);
                                         }
-                                    
+                                        
+                                        stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                                        
                                     }
                                     
-                                    ( * MSGServerProcess.databaseClass->cursorClose)(database,cursor);
-                                }
+                                    if(cursor){
+                                    
+                                        while ((entity = ( * MSGServerProcess.databaseClass->cursorNext)(database,cursor,&dbuf))) {
+                                            
+                                            
+                                            if(* block && MSGBlockHasUser(block, entity->user)){
+                                                continue;
+                                            }
+                                            
+                                            sbuf.length = snprintf(sbuf.data, sbuf.size,"Content-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\nFrom: %s\r\nResource-URI:%s\r\n\r\n"
+                                                                   ,entity->type,entity->length,entity->timestamp,entity->user,entity->uri);
+                                            
+                                            sbuf.length = snprintf(sbuf.data, sbuf.size, "%x\r\nContent-Type: %s\r\nContent-Length: %u\r\nTimestamp: %f\r\nFrom: %s\r\nResource-URI:%s\r\n\r\n"
+                                                                   ,sbuf.length + entity->length + 2, entity->type,entity->length,entity->timestamp,entity->user,entity->uri);
+                                            
+                                            MSGBufferExpandSize(&sbuf, sbuf.length + entity->length + 8);
+                                            
+                                            if(entity->length){
+                                                memcpy(sbuf.data + sbuf.length, (hchar *)entity + sizeof(MSGDatabaseEntity), entity->length);
+                                                sbuf.length += entity->length;
+                                            }
+                                            
+                                            memcpy(sbuf.data + sbuf.length, "\r\n\r\n", 4);
+                                            
+                                            sbuf.length += 4;
+                                            
+                                            state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
+                                            
+                                            if(state == StreamStateOK){
+                                                stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                                            }
+                                            else{
+                                                break;
+                                            }
+                                        
+                                        }
+                                        
+                                        ( * MSGServerProcess.databaseClass->cursorClose)(database,cursor);
+                                    }
 
-                                
-                                (* MSGServerProcess.databaseClass->close) (database);
-                                
-                                sbuf.length = snprintf(sbuf.data, sbuf.size,"0\r\n\r\n");
-                                
-                                state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
-                                
-                                if(state == StreamStateOK){
-                                    stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                                    
+                                    (* MSGServerProcess.databaseClass->close) (database);
+                                    
+                                    sbuf.length = snprintf(sbuf.data, sbuf.size,"0\r\n\r\n");
+                                    
+                                    state = stream_socket_has_space(thread->client, RESPONSE_TIMEOUT);
+                                    
+                                    if(state == StreamStateOK){
+                                        stream_socket_write(thread->client, sbuf.data, sbuf.length);
+                                    }
                                 }
                             }
                         }

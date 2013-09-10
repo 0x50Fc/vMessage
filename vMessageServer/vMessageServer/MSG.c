@@ -231,3 +231,24 @@ MSGHttpHeader * MSGHttpRequestGetHeader(MSGHttpRequest * request,MSGBuffer * buf
     return NULL;
 }
 
+hbool MSGBlockHasUser(hcchar * block,hcchar * user){
+    if(block && user){
+        hchar *p = (hchar *)block;
+        hint32 l = (hint32)strlen(user),i=0;
+        while(*p!='\0'){
+            if(user[i] == '\0'){
+                break;
+            }
+            if(*p == user[i]){
+                i++;
+            }
+            else{
+                p = p -i;
+                i = 0;
+            }
+            p++;
+        }
+        return i==l && (*p =='\0' || *p ==' ' || *p ==',' || *p == ';') ;
+    }
+    return 0;
+}
