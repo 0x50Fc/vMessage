@@ -151,6 +151,7 @@ static void MSGAuthDefaultDidWritedEntity (MSGAuth * auth,struct _MSGDatabaseEnt
         MSGDatabaseEntity e;
         pid_t pid;
         char sbuf[64];
+        int     stat;
         
         memcpy(&a,auth, sizeof(MSGAuth));
         memcpy(&e,entity, sizeof(MSGDatabaseEntity));
@@ -165,6 +166,15 @@ static void MSGAuthDefaultDidWritedEntity (MSGAuth * auth,struct _MSGDatabaseEnt
         else if(pid == 0)
         {
             
+            signal(SIGCHLD, SIG_DFL);
+            signal(SIGINT, SIG_DFL);
+            signal(SIGTERM, SIG_DFL);
+            signal(SIGKILL, SIG_DFL);
+            signal(SIGABRT, SIG_DFL);
+            signal(SIGPIPE, SIG_DFL);
+            signal(SIGTTOU, SIG_DFL);
+            signal(ETIMEDOUT, SIG_DFL);
+            
             setenv(MSG_ENV_USER, a.user, 1);
             setenv(MSG_ENV_TO, a.to, 1);
             setenv(MSG_ENV_COOKIE, a.cookie, 1);
@@ -178,7 +188,15 @@ static void MSGAuthDefaultDidWritedEntity (MSGAuth * auth,struct _MSGDatabaseEnt
             
             exit(EXIT_SUCCESS);
         }
-        
+        else{
+            
+            while(pid == waitpid(pid, &stat, WNOHANG)){
+                if(WIFEXITED(stat)){
+                    break;
+                }
+            }
+            
+        }
 
     }
 }
