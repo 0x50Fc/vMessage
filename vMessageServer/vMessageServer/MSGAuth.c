@@ -151,8 +151,7 @@ static void MSGAuthDefaultDidWritedEntity (MSGAuth * auth,struct _MSGDatabaseEnt
         MSGDatabaseEntity e;
         pid_t pid;
         char sbuf[64];
-        int     stat;
-        
+
         memcpy(&a,auth, sizeof(MSGAuth));
         memcpy(&e,entity, sizeof(MSGDatabaseEntity));
         
@@ -187,15 +186,6 @@ static void MSGAuthDefaultDidWritedEntity (MSGAuth * auth,struct _MSGDatabaseEnt
             execl("/bin/sh","sh","-c",a.didWritedEntityExec,NULL);
             
             exit(EXIT_SUCCESS);
-        }
-        else{
-            
-            while(pid == waitpid(pid, &stat, WNOHANG)){
-                if(WIFEXITED(stat)){
-                    break;
-                }
-            }
-            
         }
 
     }
