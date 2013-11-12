@@ -10,9 +10,10 @@
         
         <script type="text/javascript">
             
-            var port = 65412;
-            var username = "hailong";
-            var password = "12345678";
+            var domain = "www.9vteam.com";
+            var port = 9777;
+            var username = "9vteam";
+            var password = "9vcoder";
             
             var message,to,body,commit;
             
@@ -21,9 +22,10 @@
                 message = document.getElementById("message");
                 to = document.getElementById("to");
                 body = document.getElementById("body");
+                title = document.getElementById("title");
                 commit = document.getElementById("commit");
                 
-                MSG = new vMessageClient("http://localhost:"+port,username,password);
+                MSG = new vMessageClient("http://"+domain+":"+port,username,password);
                 
                 MSG.onmessage = function(msg){
                     
@@ -31,6 +33,7 @@
                     
                     html.push("<h1>");
                     html.push(msg.header["From"]);
+                    html.push("("+msg.body["title"]+")")
                     html.push(":</h1>");
                     
                     html.push("<p>");
@@ -61,7 +64,7 @@
             
             function send(){
                 
-                MSG.send(to.value, {"body":body.value});
+                MSG.send(to.value, {"body":body.value,"title":title.value});
                 
                 body.value = "";
                 
@@ -149,7 +152,11 @@
             
         </div>
         <form class="send" onsubmit="return send();">
-            <input id="to" class="to" type="text" value="hailong" title="to"></input><br />
+            <label>To</label><br />
+            <input id="to" class="to" type="text" value="9vteam" title="to"></input><br />
+            <label>Title</label><br />
+            <input id="title" class="to" type="text" value="" title="title"></input><br />
+            <label>Body</label><br />
             <input id="body" class="body" type="text" value="" title="body"></input><br />
             <input id="commit" class="commit" type="submit" value="Send" ></input>
         </form>
