@@ -51,6 +51,10 @@ int main(int argc, char ** argv)
         {{argc,argv},{processs,MIN(MAX_PROCESS_COUNT,DEFAULT_PROCESS_COUNT)},{0},0},{0},SRVServerLogMSG
     };
     
+#ifdef DEBUG
+    srv.logCallback = NULL;
+#endif
+    
     {
         int i;
         

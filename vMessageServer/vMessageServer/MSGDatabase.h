@@ -28,6 +28,7 @@ extern "C" {
         hchar uri[MSG_DATABASE_RESOURCE_URI_SIZE];
         huint32 length;
         hdouble timestamp;
+        huint32 verify;
     } MSGDatabaseEntity;
     
     typedef struct _MSGDatabaseResult {
@@ -94,6 +95,10 @@ extern "C" {
     extern MSGDatabaseResult MSGDatabaseResultWriteError;
     
     extern MSGDatabaseClass MSGDatabaseDefaultClass;
+    
+    huint32 MSGDatabaseEntityVerify(MSGDatabaseEntity * entity);
+    
+    bool MSGDatabaseEntityIsVerify(MSGDatabaseEntity * entity);
     
 #ifdef __cplusplus
 }

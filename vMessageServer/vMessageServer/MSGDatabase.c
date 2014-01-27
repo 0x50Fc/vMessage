@@ -75,6 +75,8 @@ static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth
         strncpy(entity->uri, uri,sizeof(entity->uri));
     }
     
+    entity->verify = MSGDatabaseEntityVerify(entity);
+    
     memcpy(dbuf->data + sizeof(MSGDatabaseEntity), sbuf->data + dataOffset, entity->length );
     
     snprintf(path, sizeof(path),"%s/%s/db",dir,auth->to);
@@ -305,7 +307,7 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
 static MSGDatabaseEntity * MSGDatabaseDefaultCursorNext (MSGDatabase * database,MSGDatabaseCursor * cursor,MSGBuffer * dbuf){
     
     MSGDatabaseCursorImpl * cur = (MSGDatabaseCursorImpl *) cursor;
-    MSGDatabaseEntity entity;
+    MSGDatabaseEntity entity, * pEntity;
     huint32 len;
     
     if(cursor->length ==0){
@@ -324,6 +326,8 @@ static MSGDatabaseEntity * MSGDatabaseDefaultCursorNext (MSGDatabase * database,
         
         cursor->length = len / sizeof(MSGDatabaseIndex);
         cursor->index = 0;
+        
+        cur->base.location += cursor->length;
     }
     
     lseek(cur->dbfno, cursor->indexes[cursor->index].location, SEEK_SET);
@@ -343,7 +347,13 @@ static MSGDatabaseEntity * MSGDatabaseDefaultCursorNext (MSGDatabase * database,
     cursor->index ++;
     cursor->length --;
     
-    return (MSGDatabaseEntity *) dbuf->data;
+    pEntity = (MSGDatabaseEntity *) dbuf->data;
+    
+    if(MSGDatabaseEntityIsVerify(pEntity)){
+        return pEntity;
+    }
+    
+    return NULL;
 }
 
 static void MSGDatabaseDefaultCursorClose (MSGDatabase * database,MSGDatabaseCursor * cursor){
@@ -467,6 +477,29 @@ static void MSGDatabaseDefaultRemoveResource (MSGDatabase * database,MSGAuth * a
     }
 }
 
+huint32 MSGDatabaseEntityVerify(MSGDatabaseEntity * entity){
+    
+    huint32 v = entity->verify;
+    huint32 verify = 0;
+    hubyte * p = (hubyte *) entity;
+    huint32 len = sizeof(MSGDatabaseEntity);
+    
+    entity->verify = 0;
+    
+    while(len >0){
+        verify += * p;
+        p ++;
+        len --;
+    }
+    
+    entity->verify = v;
+    
+    return verify;
+}
+
+bool MSGDatabaseEntityIsVerify(MSGDatabaseEntity * entity){
+    return MSGDatabaseEntityVerify(entity) == entity->verify;
+}
 
 
 MSGDatabaseClass MSGDatabaseDefaultClass = {
