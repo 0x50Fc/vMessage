@@ -26,10 +26,12 @@ vMessageClient.prototype = {
             
             if(url.length >0){
                 
+                var http ;
+                
                 try {
-                    this.recvHttp = new XMLHttpRequest();
+                    http = new XMLHttpRequest();
                 } catch(e){
-                    this.recvHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                    http = new ActiveXObject("Microsoft.XMLHTTP");
                 }
                 
                 var lChar = url.substr(url.length - 1,0);
@@ -41,14 +43,15 @@ vMessageClient.prototype = {
                     url = url + "/" + this.timestamp;
                 }
                                 
-                this.recvHttp.open("GET",url,true,this.username,this.password);
+                http.open("GET",url,true,this.username,this.password);
                 
                 if(this.username){
-                    this.recvHttp.setRequestHeader("Authorization","Basic "+btoa(this.username + ":" + this.password));
+                    http.setRequestHeader("Authorization","Basic "+btoa(this.username + ":" + this.password));
                 }
                 
+                this.recvHttp = http;
+                
                 var self = this;
-                var http = this.recvHttp;
                 var index = 0;
                 var state = 0;
                 var key = [];
@@ -188,7 +191,7 @@ vMessageClient.prototype = {
                     }
                 };
                 
-                this.recvHttp.onreadystatechange = function (){
+                http.onreadystatechange = function (){
                     if(http.readyState == 3){
                         readFn();
                     }
@@ -204,7 +207,7 @@ vMessageClient.prototype = {
                             
                             var tm = http.getResponseHeader("Timestamp");
                             
-                            if(tm){
+                            if(tm && self.timestamp == "0"){
                                 self.timestamp = tm;
                             }
                             

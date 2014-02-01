@@ -11,6 +11,41 @@
 
 #include "hserver.h"
 
+static inline int os_file_open(const char * path,int flags,mode_t mode){
+    int rc;
+    do{ rc = open(path, flags,mode); } while( rc<0 && errno==EINTR );
+    return rc;
+}
+
+static inline void os_file_close(int file){
+    int rc;
+    do{ rc = close(file); } while( rc<0 && errno==EINTR );
+}
+
+static inline int os_file_lock(int file,int op){
+    int rc;
+    do{ rc = flock(file,op); }while( rc<0 && errno==EINTR );
+    return rc;
+}
+
+static inline ssize_t os_file_read(int file,void * bytes,size_t length){
+    ssize_t rc;
+    do{ rc = read(file, bytes, length); }while( rc<0 && errno==EINTR );
+    return rc;
+}
+
+static inline ssize_t os_file_write(int file,void * bytes,size_t length){
+    ssize_t rc;
+    do{ rc = write(file, bytes, length); }while( rc<0 && errno==EINTR );
+    return rc;
+}
+
+static inline off_t os_file_seek(int file,off_t off,int by){
+    return lseek(file, off, by);
+}
+
+#define MODE S_IRWXU | S_IRWXG
+
 
 MSGDatabaseResult MSGDatabaseResultOK = {200,"OK"};
 
@@ -82,30 +117,31 @@ static MSGDatabaseResult MSGDatabaseDefaultWrite (MSGDatabase * database,MSGAuth
     snprintf(path, sizeof(path),"%s/%s/db",dir,auth->to);
     
     if(stat(path, &s) == -1){
-        mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        mkdir(path, MODE);
     }
     
     strcat(path, "/w.db");
     
-    fno = open(path, O_WRONLY | O_APPEND);
+    fno = os_file_open(path, O_WRONLY | O_APPEND,MODE);
     
     if(fno == -1){
-        fno = open(path, O_WRONLY | O_CREAT);
+        
+        fno = os_file_open(path, O_WRONLY | O_CREAT,MODE);
+        
         if(fno != -1){
-            fchmod(fno, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-            close(fno);
+            os_file_close(fno);
         }
+        
+        fno = os_file_open(path, O_WRONLY | O_APPEND,MODE);
     }
-    
-    fno = open(path, O_WRONLY | O_APPEND);
     
     if(fno != -1){
         
-        if(size != write(fno, dbuf->data, size)){
+        if(size != os_file_write(fno, dbuf->data, size)){
             rs = MSGDatabaseResultWriteError;
         }
         
-        close(fno);
+        os_file_close(fno);
     }
     else{
         rs = MSGDatabaseResultWriteError;
@@ -142,7 +178,7 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
 
     snprintf(path, sizeof(path),"%s/%s/db/w.db",dir,auth->user);
     
-    dbfno = open(path, O_RDONLY);
+    dbfno = os_file_open(path, O_RDONLY,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     
     if(dbfno == -1){
         return NULL;
@@ -150,15 +186,14 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
     
     snprintf(path, sizeof(path),"%s/%s/db/r.db",dir,auth->user);
     
-    idxfno = open(path, O_RDWR);
+    idxfno = os_file_open(path,O_RDONLY,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     
     if(idxfno == -1){
-        idxfno = open(path, O_WRONLY | O_CREAT);
+        idxfno = os_file_open(path, O_WRONLY | O_CREAT,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         if(idxfno != -1){
-            fchmod(idxfno, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-            close(idxfno);
+            os_file_close(idxfno);
         }
-        idxfno = open(path, O_RDWR);
+        idxfno = os_file_open(path,O_RDONLY,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     }
     
     if(idxfno == -1){
@@ -166,54 +201,82 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
         return NULL;
     }
     
-    flock(idxfno, LOCK_EX);
+    os_file_lock(idxfno, LOCK_SH);
     
     if(-1 == fstat(idxfno, &s)){
-        flock(idxfno, LOCK_UN);
-        close(idxfno);
-        close(dbfno);
+        os_file_lock(idxfno, LOCK_UN);
+        os_file_close(idxfno);
+        os_file_close(dbfno);
         return NULL;
     }
     
     if(request->path.length > 1){
-        strncpy(path, sbuf->data + request->path.location + 1, request->path.length - 1);
-        timestamp = atof(path);
+        sbuf->data[request->path.location + request->path.length] = 0;
+        timestamp = atof(sbuf->data + request->path.location + 1);
     }
     
     len = (huint32) (s.st_size / sizeof(MSGDatabaseIndex));
     
     if(len == 0){
-        lseek(idxfno, 0, SEEK_END);
-        lseek(dbfno, 0, SEEK_SET);
+        
     }
     else{
-        lseek(idxfno, (len -1) * sizeof(MSGDatabaseIndex), SEEK_SET);
+        
+        os_file_seek(idxfno, (len -1) * sizeof(MSGDatabaseIndex), SEEK_SET);
+        
         if(read(idxfno, &index, sizeof(MSGDatabaseIndex)) != sizeof(MSGDatabaseIndex)){
-            flock(idxfno, LOCK_UN);
-            close(idxfno);
-            close(dbfno);
+            os_file_lock(idxfno, LOCK_UN);
+            os_file_close(idxfno);
+            os_file_close(dbfno);
             return NULL;
         }
+        
         if(timestamp == 0.0){
             timestamp = index.timestamp;
         }
-        lseek(dbfno, index.location, SEEK_SET);
-        if(read(dbfno, & entity,sizeof(MSGDatabaseEntity)) == sizeof(MSGDatabaseEntity)){
-            lseek(dbfno, entity.length, SEEK_CUR);
+        
+        os_file_seek(dbfno, index.location, SEEK_SET);
+        
+        if(os_file_read(dbfno, & entity,sizeof(MSGDatabaseEntity)) == sizeof(MSGDatabaseEntity)){
+            os_file_seek(dbfno, entity.length, SEEK_CUR);
         }
     }
     
-    while(read(dbfno, &entity, sizeof(MSGDatabaseEntity)) == sizeof(MSGDatabaseEntity)){
+    os_file_lock(idxfno, LOCK_UN);
+    os_file_close(idxfno);
+    
+    idxfno = os_file_open(path,O_WRONLY | O_APPEND,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    
+    if(idxfno == -1){
+        os_file_close(dbfno);
+        return NULL;
+    }
+    
+    os_file_lock(idxfno, LOCK_EX);
+    
+    while(os_file_read(dbfno, &entity, sizeof(MSGDatabaseEntity)) == sizeof(MSGDatabaseEntity)){
         
         index.location = (huint32)( lseek(dbfno, 0, SEEK_CUR) - sizeof(MSGDatabaseEntity) );
         index.timestamp = entity.timestamp;
         
-        write(idxfno, & index, sizeof(MSGDatabaseIndex));
+        os_file_write(idxfno, & index, sizeof(MSGDatabaseIndex));
         
-        lseek(dbfno, entity.length, SEEK_CUR);
+        os_file_seek(dbfno, entity.length, SEEK_CUR);
         
         len ++;
     }
+    
+    os_file_lock(idxfno, LOCK_UN);
+    os_file_close(idxfno);
+    
+    idxfno = os_file_open(path,O_RDONLY,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    
+    if(idxfno == -1){
+        os_file_close(dbfno);
+        return NULL;
+    }
+    
+    os_file_lock(idxfno, LOCK_SH);
     
     cursor = (MSGDatabaseCursorImpl *) malloc(sizeof(MSGDatabaseCursorImpl));
     
@@ -228,7 +291,7 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
     
     if( timestamp == 0.0){
         
-        lseek(idxfno, 0, SEEK_SET);
+        os_file_seek(idxfno, 0, SEEK_SET);
         len = (huint32)read(idxfno, cursor->base.indexes, cursor->base.size * sizeof(MSGDatabaseIndex));
         cursor->base.length = len / sizeof(MSGDatabaseIndex);
         
@@ -241,16 +304,16 @@ static MSGDatabaseCursor * MSGDatabaseDefaultCursorOpen (MSGDatabase * database,
         
         while(1){
 
-            lseek(idxfno, cursor->base.location * sizeof(MSGDatabaseIndex), SEEK_SET);
+            os_file_seek(idxfno, cursor->base.location * sizeof(MSGDatabaseIndex), SEEK_SET);
             
-            len = (huint32)read(idxfno, cursor->base.indexes, cursor->base.size * sizeof(MSGDatabaseIndex));
+            len = (huint32) os_file_read(idxfno, cursor->base.indexes, cursor->base.size * sizeof(MSGDatabaseIndex));
             
             cursor->base.length = len / sizeof(MSGDatabaseIndex);
         
             if(cursor->base.length ==0){
-                flock(idxfno, LOCK_UN);
-                close(idxfno);
-                close(dbfno);
+                os_file_lock(idxfno, LOCK_UN);
+                os_file_close(idxfno);
+                os_file_close(dbfno);
                 free(cursor->base.indexes);
                 free(cursor);
                 return NULL;
@@ -316,9 +379,9 @@ static MSGDatabaseEntity * MSGDatabaseDefaultCursorNext (MSGDatabase * database,
             return NULL;
         }
         
-        lseek(cur->idxfno, cur->base.location + cursor->index * sizeof(MSGDatabaseIndex), SEEK_SET);
+        os_file_seek(cur->idxfno, cur->base.location + cursor->index * sizeof(MSGDatabaseIndex), SEEK_SET);
         
-        len = (huint32) read(cur->idxfno, cur->base.indexes, cur->base.size * sizeof(MSGDatabaseIndex));
+        len = (huint32) os_file_read(cur->idxfno, cur->base.indexes, cur->base.size * sizeof(MSGDatabaseIndex));
         
         if(len < sizeof(MSGDatabaseIndex)){
             return NULL;
@@ -330,9 +393,9 @@ static MSGDatabaseEntity * MSGDatabaseDefaultCursorNext (MSGDatabase * database,
         cur->base.location += cursor->length;
     }
     
-    lseek(cur->dbfno, cursor->indexes[cursor->index].location, SEEK_SET);
+    os_file_seek(cur->dbfno, cursor->indexes[cursor->index].location, SEEK_SET);
     
-    if(read(cur->dbfno, &entity, sizeof(MSGDatabaseEntity)) != sizeof(MSGDatabaseEntity)){
+    if(os_file_read(cur->dbfno, &entity, sizeof(MSGDatabaseEntity)) != sizeof(MSGDatabaseEntity)){
         return NULL;
     }
     
@@ -340,7 +403,7 @@ static MSGDatabaseEntity * MSGDatabaseDefaultCursorNext (MSGDatabase * database,
     
     memcpy(dbuf->data, &entity, sizeof(MSGDatabaseEntity));
     
-    if(read(cur->dbfno,dbuf->data + sizeof(MSGDatabaseEntity), entity.length) != entity.length){
+    if(os_file_read(cur->dbfno,dbuf->data + sizeof(MSGDatabaseEntity), entity.length) != entity.length){
         return NULL;
     }
     
@@ -364,10 +427,10 @@ static void MSGDatabaseDefaultCursorClose (MSGDatabase * database,MSGDatabaseCur
         free(cursor->indexes);
     }
     
-    flock(cur->idxfno, LOCK_UN);
+    os_file_lock(cur->idxfno, LOCK_UN);
     
-    close(cur->idxfno);
-    close(cur->dbfno);
+    os_file_close(cur->idxfno);
+    os_file_close(cur->dbfno);
     
     free(cursor);
 }
@@ -388,7 +451,7 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
         
         snprintf(path, sizeof(path),"%s/%s/res/%s",dir,auth->user,uuid);
         
-        fno = open(path, O_RDONLY);
+        fno = os_file_open(path, O_RDONLY,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         
         if(fno == -1){
             return hbool_false;
@@ -426,18 +489,16 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
             }
         }
         
-        fno = open(path, O_WRONLY | O_CREAT | O_TRUNC);
+        fno = os_file_open(path, O_WRONLY | O_CREAT | O_TRUNC,S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         
         if(fno == -1){
             return hbool_false;
         }
         
-        fchmod(fno, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        
         strncpy(res->type, contentType, sizeof(res->type));
         
-        if(write(fno, res->type, sizeof(res->type)) != sizeof(res->type)){
-            close(fno);
+        if(os_file_write(fno, res->type, sizeof(res->type)) != sizeof(res->type)){
+            os_file_close(fno);
             unlink(path);
             return hbool_false;
         }
@@ -455,7 +516,7 @@ static hbool MSGDatabaseDefaultOpenResource (MSGDatabase * database,MSGAuth * au
 static void MSGDatabaseDefaultCloseResource (MSGDatabase * database,MSGAuth * auth,MSGDatabaseResource * res){
     
     if(res->fno >0){
-        close(res->fno);
+        os_file_close(res->fno);
         res->fno = -1;
     }
 
